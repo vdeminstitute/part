@@ -1,0 +1,6 @@
+model,set,measure,value
+mdl2,test forecasts,Accuracy,0.9239222316145393
+mdl2,test forecasts,Kappa,0
+mdl2,test forecasts,AUC_ROC,0.654579648266748
+mdl2,test forecasts,AUC_PR,0.1467968216868515
+mdl2,test forecasts,Brier,0.06944875994287353

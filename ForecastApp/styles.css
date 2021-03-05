@@ -1,0 +1,50 @@
+input[type="number"] {
+  max-width: 80%;
+}
+.leaflet-container { background-color: #F5F5F6; 
+}
+
+div.outer {
+  top: 41px;
+  left: 0; 
+  right: 0;
+  bottom: 0;
+  padding: 0;
+}
+body, label, input, button, select { 
+  font-family: 'Helvetica Neue', Helvetica;
+  font-weight: 200;
+}
+h1, h2, h3 { 
+  font-weight: 400; 
+  color: #861B58;
+  }
+h4 { 
+  font-weight: 400; 
+  }
+
+#mapPanel {
+  right: auto;
+}
+#barplotPanel1 {
+  left: -25px;
+}
+#densityplotsPanel {
+  left: 100px;
+}
+#barplot1 {
+  cursor: pointer;
+}
+.panel {
+    border: none; 
+    background-color: #ffffff; 
+  }
+#dataTable {
+  font-size: 95%;
+}
+#cite {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  font-size: 12px;
+}
