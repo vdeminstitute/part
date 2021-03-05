@@ -2,26 +2,26 @@
 #   Setup training environment
 #   2019-02-20
 #
-#   Run this before trying to train a model; this sets up the globals and 
+#   Run this before trying to train a model; this sets up the globals and
 #   data.
 #
 
-packs <- c("tidyverse", "rio", "mlr", "glmnet", "here", "MLmetrics", "pROC", 
-           "xtable", "futile.logger", "parallelMap", "e1071", "MLmetrics", 
+packs <- c("tidyverse", "rio", "mlr", "glmnet", "here", "MLmetrics", "pROC",
+           "xtable", "futile.logger", "parallelMap", "e1071", "MLmetrics",
            "doParallel", "states")
 # install.packages(packs, dependencies = TRUE)
 # install.packages("C:/Users/xricmo/Dropbox/VForecast/vfcast_0.0.1.tar.gz")
 lapply(packs, library, character.only = TRUE)
 
-stopifnot(basename(getwd())=="VForecast")
+stopifnot(basename(getwd())=="Models")
 
 # which year to forecast for?
 TARGET_YEAR <- 2019
 # test forecast years
-TEST_FORECAST_YEARS <- 2011:2017  # this should be one less than TARGET_YEAR 
-                                  # because any_neg_change_2yr looks ahead at 
-                                  # next year, but we don't know what 
-                                  # any_neg_change in 
+TEST_FORECAST_YEARS <- 2011:2017  # this should be one less than TARGET_YEAR
+                                  # because any_neg_change_2yr looks ahead at
+                                  # next year, but we don't know what
+                                  # any_neg_change in
 TARGET <- "any_neg_change_2yr"
 
 # Model training settings
@@ -59,21 +59,21 @@ cnames <- gwstates %>%
   dplyr::slice(n()) %>%
   select(gwcode, country_name)
 
-# Complete, non-missing data, except for the TARGET, which will be missing for the 
+# Complete, non-missing data, except for the TARGET, which will be missing for the
 # last year.
 
 complete_data <- read_csv("input/ALL_data_final_USE_v9.csv")
 # # take these out from training data
 id_cols <- c("gwcode", "year", "country_name", "country_text_id", "country_id",
-             "v2x_regime", "v2x_regime_amb", "any_neg_change") 
+             "v2x_regime", "v2x_regime_amb", "any_neg_change")
 
 drop_vars <- c("date", "lagged_v2x_regime_asCharacter", "lagged_v2x_regime_asFactor")
 dim(complete_data)[2] - length(id_cols) - length(drop_vars)
 
 
 # Check there are only missing target values in last year
-missing_target_by_year <- complete_data %>% 
-  group_by(year) %>% 
+missing_target_by_year <- complete_data %>%
+  group_by(year) %>%
   summarize(n = sum(is.na(any_neg_change_2yr)))
 
 # check
@@ -88,31 +88,31 @@ fcast_idx <- complete_data$year %in% missing_target_by_year$year[missing_target_
 
 complete_data <- complete_data%>%
   mutate(any_neg_change_2yr = factor(any_neg_change_2yr)) %>%
-  # convert hidden discrete vars to dummy 
+  # convert hidden discrete vars to dummy
   # NOTE: this does not leave out a reference level; take out intercept in any
   # models that include this feature
   mutate(lagged_v2x_regime = as.factor(lagged_v2x_regime)) %>%
   mlr::createDummyFeatures(., cols = "lagged_v2x_regime")
 
-# Split data; this will be a list containing all the data partitions we 
+# Split data; this will be a list containing all the data partitions we
 # need for training, out-of-sample eval, etc.
 split_data <- list(
   # Training set
-  train_ids = complete_data %>% dplyr::filter(train_idx) %>% 
-    dplyr::select(id_cols),
-  train     = complete_data %>% dplyr::filter(train_idx) %>% 
+  train_ids = complete_data %>% dplyr::filter(train_idx) %>%
+    dplyr::select(all_of(id_cols)),
+  train     = complete_data %>% dplyr::filter(train_idx) %>%
     dplyr::select(-one_of(id_cols, drop_vars)) %>% as.data.frame(),
   # Forecast data
-  fcast_ids = complete_data %>% dplyr::filter(fcast_idx) %>% 
-    dplyr::select(id_cols),
-  fcast     = complete_data %>% dplyr::filter(fcast_idx) %>% 
+  fcast_ids = complete_data %>% dplyr::filter(fcast_idx) %>%
+    dplyr::select(all_of(id_cols)),
+  fcast     = complete_data %>% dplyr::filter(fcast_idx) %>%
     dplyr::select(-one_of(id_cols, drop_vars)) %>% as.data.frame()
 )
 
 write_rds(split_data, "output/split-data.rds")
 
-full_task <- makeClassifTask(data = split_data$train, 
-                             target = "any_neg_change_2yr", 
+full_task <- makeClassifTask(data = split_data$train,
+                             target = "any_neg_change_2yr",
                              positive = "1")
 
 
