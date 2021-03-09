@@ -8,31 +8,37 @@
 #   this is all the stuff in input, which should be GW normalized already
 #   output is in ... output
 #
-
-
-packs <- c("tidyverse", "rio", "states", "vfcast", "mlr")
-# install.packages(packs, dependencies = TRUE)
-lapply(packs, library, character.only = TRUE)
-
-setwd(vpath("Data/v9"))
-
-source("../../regime-forecast/R/functions.R")
-
-plotmiss <- function(x) {
-  x$date <- as.Date(paste0(x$year, "-12-31"))
-  plot_missing(x, names(x), "gwcode", "date", "year", "GW", partial = "any")
-}
+#   Output: part-vX.csv
+#
 
 # Which year should the data reach to?
-TARGET_YEAR <- 2019
-TARGET <- "any_neg_change"
-lag_n <- 1
+TARGET_YEAR <- 2021
+VERSION <- "v11"
+
+library(dplyr)
+library(tidyr)
+library(states)
+library(readr)
+library(yaml)
+library(mlr)  # to create dummy features
+
+naCountFun <- function(dat, exclude_year){
+  dat%>%
+    filter(year < exclude_year)%>%
+    sapply(function(x) sum(is.na(x)))%>%
+    sort()
+}
+
+plotmiss <- function(x) {
+  plot_missing(x, names(x), "gwcode", time = "year", statelist = "GW", partial = "any")
+}
+
 
 #
 #   EPR ----
 #   ______________
 
-epr_dat <- import("input/epr-yearly.csv") %>%
+epr_dat <- read_csv("input/epr-yearly.csv", col_types = cols()) %>%
   select(-date) %>%
   filter(year < TARGET_YEAR) %>%
   mutate(year = year + TARGET_YEAR - max(year))
@@ -45,8 +51,7 @@ plotmiss(epr_dat)
 #   GDP ----
 #   __________________
 
-gdp_dat <- import("input/gdp_1950_2017.csv") %>%
-  select(-date) %>%
+gdp_dat <- read_csv("input/gdp.csv", col_types = cols()) %>%
   filter(year < TARGET_YEAR) %>%
   dplyr::rename(gdp = NY.GDP.MKTP.KD,
                 gdp_growth = NY.GDP.MKTP.KD.ZG,
@@ -64,7 +69,7 @@ plotmiss(gdp_dat)
 #   State age ----
 #   ________________________
 
-age_dat <- import("input/gwstate-age.csv") %>%
+age_dat <- read_csv("input/gwstate-age.csv", col_types = cols()) %>%
   filter(year < TARGET_YEAR) %>%
   mutate(year = year + TARGET_YEAR - max(year))
 names(age_dat)[-c(1:2)] <- paste("lagged_", names(age_dat)[-c(1:2)], sep = "")
@@ -77,7 +82,7 @@ plotmiss(age_dat)
 #   Population ----
 #   ___________
 
-pop_dat <- import("input/population.csv") %>%
+pop_dat <- read_csv("input/population.csv", col_types = cols()) %>%
   filter(year < TARGET_YEAR) %>%
   mutate(year = year + pmax(0, TARGET_YEAR - max(year))) %>%
   # log this sucker
@@ -92,9 +97,9 @@ plotmiss(pop_dat)
 #   Coups ----
 #   __________
 
-coup_dat <- import("input/ptcoups.csv") %>%
+coup_dat <- read_csv("input/ptcoups.csv", col_types = cols()) %>%
   filter(year < TARGET_YEAR) %>%
-  select(-c(date, pt_failed_coup_attempt_total, pt_failed_coup_attempt_num5yrs, pt_failed_coup_attempt_num10yrs))%>%
+  select(-c(pt_failed_total, pt_failed_num5yrs, pt_failed_num10yrs))%>%
   mutate(year = year + TARGET_YEAR - max(year))
 names(coup_dat)[-c(1:2)] <- paste("lagged_", names(coup_dat)[-c(1:2)], sep = "")
 str(coup_dat)
@@ -106,7 +111,7 @@ plotmiss(coup_dat)
 #   ACD ----
 #   ______
 
-acd_dat <- import("input/acd.csv") %>%
+acd_dat <- read_csv("input/acd.csv", col_types = cols()) %>%
   filter(year < TARGET_YEAR) %>%
   select(gwcode, year, everything()) %>%
   mutate(year = year + pmax(0, TARGET_YEAR - max(year)))
@@ -121,7 +126,7 @@ plotmiss(acd_dat)
 #   ______
 
 
-infmort <- import("input/wdi-infmort.csv") %>%
+infmort <- read_csv("input/wdi-infmort.csv", col_types = cols()) %>%
   filter(year < TARGET_YEAR) %>%
   select(gwcode, year, everything()) %>%
   mutate(year = year + pmax(0, TARGET_YEAR - max(year)))
@@ -136,7 +141,7 @@ plotmiss(infmort)
 #   ______
 
 
-ict <- import("input/wdi-ict.csv") %>%
+ict <- read_csv("input/wdi-ict.csv", col_types = cols()) %>%
   filter(year < TARGET_YEAR) %>%
   select(gwcode, year, everything()) %>%
   mutate(year = year + pmax(0, TARGET_YEAR - max(year)))
@@ -151,15 +156,15 @@ plotmiss(ict)
 #   ___________
 
 ## All observations we have a DV for...
-# VDem_GW_regime_shift_data <- import("input/VDem_GW_data_final_USE.csv")
-VDem_GW_regime_shift_data <- import("input/VDem_GW_data_final_USE_2yr_target_v9.csv")
-str(VDem_GW_regime_shift_data) ## 'data.frame':  7923 obs. of  408
-# naCountFun(VDem_GW_regime_shift_data, TARGET_YEAR)
+VDem_GW_regime_shift_data <- read_rds("output/vdem-augmented.rds")
+dim(VDem_GW_regime_shift_data)
+# v9:  7923 x 408
+# v11: 8190 x 392
 naCountFun(VDem_GW_regime_shift_data, TARGET_YEAR + 1)
 
 VDem_GW_regime_shift_data <- VDem_GW_regime_shift_data %>%
   mutate(lagged_v2x_regime_amb = as.factor(lagged_v2x_regime_amb)) %>%
-  createDummyFeatures(., cols = "lagged_v2x_regime_amb")
+  mlr::createDummyFeatures(., cols = "lagged_v2x_regime_amb")
 
 # here it's ok if we have up to target year
 range(VDem_GW_regime_shift_data$year)
@@ -180,21 +185,21 @@ VDem_GW_regime_shift_data %>%
 
 
 
-#
-#   Join all ----
-#   ____________
+
+# Merge all datasets ------------------------------------------------------
+
 
 ###########################
 # Create master template
 
 ## GW_template is a balanced gwcode yearly data frame from 1970 to 2018. Need to drop microstates.
 drop <- gwstates$gwcode[gwstates$microstate == TRUE]
-GW_template <- state_panel(as.Date("1970-01-01"), as.Date(paste0(TARGET_YEAR, "-01-01")), by = "year", partial = "any", useGW = TRUE)%>%
-  mutate(year = lubridate::year(date), date = NULL)%>%
+GW_template <- state_panel(1970, TARGET_YEAR, by = "year", partial = "any",
+                           useGW = TRUE) %>%
   filter(!(gwcode %in% drop))
 
 ## after the merge, all of the NAs that remain are from the external datasets. It looks like it is the first year in each series. We will need to back fill these variables...
-VDem_GW_regime_shift_external_data <- VDem_GW_regime_shift_data %>%
+part <- VDem_GW_regime_shift_data %>%
   left_join(GW_template) %>%
   left_join(epr_dat) %>%
   left_join(gdp_dat) %>%
@@ -209,21 +214,21 @@ VDem_GW_regime_shift_external_data <- VDem_GW_regime_shift_data %>%
   arrange(year) %>%
   fill(lagged_pop, .direction = "up")%>%
   fill(lagged_state_age, .direction = "up")%>%
-  fill(lagged_pt_coup_attempt, .direction = "up")%>%
-  fill(lagged_pt_coup_attempt_num, .direction = "up")%>%
+  fill(lagged_pt_attempt, .direction = "up")%>%
+  fill(lagged_pt_attempt_num, .direction = "up")%>%
   fill(lagged_pt_coup_num, .direction = "up")%>%
   fill(lagged_pt_coup, .direction = "up")%>%
-  fill(lagged_pt_failed_coup_attempt_num, .direction = "up")%>%
-  fill(lagged_pt_failed_coup_attempt, .direction = "up")%>%
+  fill(lagged_pt_failed_num, .direction = "up")%>%
+  fill(lagged_pt_failed, .direction = "up")%>%
   fill(lagged_pt_coup_total, .direction = "up")%>%
-  fill(lagged_pt_coup_attempt_total, .direction = "up")%>%
+  fill(lagged_pt_attempt_total, .direction = "up")%>%
   fill(lagged_pt_coup_num5yrs, .direction = "up")%>%
-  fill(lagged_pt_coup_attempt_num5yrs, .direction = "up")%>%
+  fill(lagged_pt_attempt_num5yrs, .direction = "up")%>%
   fill(lagged_pt_coup_num10yrs, .direction = "up")%>%
-  fill(lagged_pt_coup_attempt_num10yrs, .direction = "up")%>%
+  fill(lagged_pt_attempt_num10yrs, .direction = "up")%>%
   fill(lagged_years_since_last_pt_coup, .direction = "up")%>%
-  fill(lagged_years_since_last_pt_failed_coup_attempt, .direction = "up")%>%
-  fill(lagged_years_since_last_pt_coup_attempt, .direction = "up")%>%
+  fill(lagged_years_since_last_pt_failed, .direction = "up")%>%
+  fill(lagged_years_since_last_pt_attempt, .direction = "up")%>%
   fill(lagged_gdp, .direction = "up")%>%
   fill(lagged_gdp_growth, .direction = "up")%>%
   fill(lagged_gdp_pc_growth, .direction = "up")%>%
@@ -239,21 +244,21 @@ VDem_GW_regime_shift_external_data <- VDem_GW_regime_shift_data %>%
   fill(lagged_gdp_pc, .direction = "up")%>%
   fill(lagged_gdp_pc_log , .direction = "up")%>%
   fill(lagged_pop, .direction = "down")%>%
-  fill(lagged_pt_coup_attempt, .direction = "down")%>%
-  fill(lagged_pt_coup_attempt_num, .direction = "down")%>%
+  fill(lagged_pt_attempt, .direction = "down")%>%
+  fill(lagged_pt_attempt_num, .direction = "down")%>%
   fill(lagged_pt_coup_num, .direction = "down")%>%
   fill(lagged_pt_coup, .direction = "down")%>%
-  fill(lagged_pt_failed_coup_attempt_num, .direction = "down")%>%
-  fill(lagged_pt_failed_coup_attempt, .direction = "down")%>%
+  fill(lagged_pt_failed_num, .direction = "down")%>%
+  fill(lagged_pt_failed, .direction = "down")%>%
   fill(lagged_pt_coup_total, .direction = "down")%>%
-  fill(lagged_pt_coup_attempt_total, .direction = "down")%>%
+  fill(lagged_pt_attempt_total, .direction = "down")%>%
   fill(lagged_pt_coup_num5yrs, .direction = "down")%>%
-  fill(lagged_pt_coup_attempt_num5yrs, .direction = "down")%>%
+  fill(lagged_pt_attempt_num5yrs, .direction = "down")%>%
   fill(lagged_pt_coup_num10yrs, .direction = "down")%>%
-  fill(lagged_pt_coup_attempt_num10yrs, .direction = "down")%>%
+  fill(lagged_pt_attempt_num10yrs, .direction = "down")%>%
   fill(lagged_years_since_last_pt_coup, .direction = "down")%>%
-  fill(lagged_years_since_last_pt_failed_coup_attempt, .direction = "down")%>%
-  fill(lagged_years_since_last_pt_coup_attempt, .direction = "down")%>%
+  fill(lagged_years_since_last_pt_failed, .direction = "down")%>%
+  fill(lagged_years_since_last_pt_attempt, .direction = "down")%>%
   mutate(lagged_state_age = ifelse(is.na(lagged_state_age) & country_name == "South Yemen", max(lagged_state_age, na.rm = TRUE) + 1, lagged_state_age),
          lagged_state_age = ifelse(is.na(lagged_state_age) & country_name == "Republic of Vietnam", max(lagged_state_age, na.rm = TRUE) + 1, lagged_state_age),
          lagged_state_age = ifelse(is.na(lagged_state_age) & country_name == "German Democratic Republic", max(lagged_state_age, na.rm = TRUE) + 1, lagged_state_age))%>%
@@ -270,91 +275,61 @@ VDem_GW_regime_shift_external_data <- VDem_GW_regime_shift_data %>%
   ungroup() %>%
   arrange(country_id, year)
 
-colmiss <- naCountFun(VDem_GW_regime_shift_external_data, TARGET_YEAR)
+colmiss <- naCountFun(part, TARGET_YEAR)
 colmiss
 if (any(colmiss > 0)) stop("Something is wrong, some columns have missing values")
 
-colmiss_tgt <- naCountFun(VDem_GW_regime_shift_external_data, TARGET_YEAR + 1)
+colmiss_tgt <- naCountFun(part, TARGET_YEAR + 1)
 colmiss_tgt
 
-dim(VDem_GW_regime_shift_external_data) ## 7683  217
+dim(part) ## 7683  217
 
-VDem_GW_regime_shift_external_data$date <- NULL
+part$date <- NULL
 
-export(VDem_GW_regime_shift_external_data, "output/ALL_data_final_USE_v9.csv")
+# to pull out missing values
+if (FALSE) {
+  part %>%
+    filter(!complete.cases(.)) %>%
+    pivot_longer(-c(gwcode, year, country_id, country_name, country_text_id,lagged_v2x_regime_asCharacter, lagged_v2x_regime_asFactor)) %>%
+    filter(is.na(value)) %>%
+    filter(!name %in% c("any_neg_change", "any_neg_change_2yr", "v2x_regime", "v2x_regime_amb")) %>%
+    group_by(country_id, name) %>%
+    arrange(country_id, name, year) %>%
+    mutate(spell_id = id_date_sequence(year)) %>%
+    group_by(country_id, country_name, name, spell_id) %>%
+    summarize(years_missing = paste0(range(year), collapse = "-"), n = n()) %>%
+    select(-spell_id)
+}
 
+# Record signature and write out ------------------------------------------
 
-import("output/ALL_data_final_USE_v9.csv")
-export(VDem_GW_regime_shift_external_data, "../../regime-forecast/input/ALL_data_final_USE_v9.csv")
+attr(part, "spec") <- NULL
+part <- as_tibble(part)
 
-# complete_data <- read_csv("../../regime-forecast/input/ALL_data_final_USE_v9.csv")
-# naCountFun(complete_data, TARGET_YEAR + 1)
+data_signature <- function(df) {
+  out <- list()
+  out$Class <- paste(class(df), collapse = ", ")
+  out$Size_in_mem <- format(utils::object.size(df), "Mb")
+  out$N_countries <- length(unique(df$gwcode))
+  out$Years <- paste0(range(df$year, na.rm = TRUE), collapse = " - ")
+  out$N_columns <- ncol(df)
+  out$N_rows <- nrow(df)
+  out$N_complete_rows <- sum(stats::complete.cases(df))
+  out$Countries <- length(unique(df$gwcode))
+  out$Sum_any_neg_change <- as.integer(sum(df$any_neg_change, na.rm = TRUE))
+  out$Sum_any_neg_change_2yr <- as.integer(sum(df$any_neg_change_2yr, na.rm = TRUE))
+  out$Columns <- as.list(colnames(df))
+  out
+}
+sig <- data_signature(part)
 
+# Write both versioned and clean file name so that:
+# - easy to see changes on git with clean file name
+# - concise historical record with versioned file name
+write_yaml(sig, sprintf("output/part-%s-signature.yml", VERSION))
+write_yaml(sig, "output/part-signature.yml")
 
-
-### AB 2019-03-13: i stopped here, not sure below works
-
-# dontrun <- function() {
-# # ## What's not in our 2018 DV set but in vdem and gw?
-# DV_set <- import("input/VDem_GW_DV_dataframe_1970.csv")%>%
-#     select(gwcode, year, country_name, country_text_id, country_id)%>%
-#         filter(year == TARGET_YEAR)
-# dim(DV_set)
-
-# vdem_coverage <- import("input/Vdem_template.csv")%>%
-#     select(gwcode, year, country_name, country_text_id, country_id)%>%
-#         filter(year == TARGET_YEAR)
-# dim(vdem_coverage)
-
-# keep <- gwstates$gwcode[gwstates$microstate == FALSE]
-# GW_coverage <- state_panel(as.Date("1970-01-01"), as.Date(paste0(TARGET_YEAR, "-01-01")), by = "year", partial = "any", useGW = TRUE)%>%
-#     mutate(year = lubridate::year(date), date = NULL)%>%
-#         filter(gwcode %in% keep & year == TARGET_YEAR)
-# dim(GW_coverage)
-
-# ## dropped from vdem
-# anti_join(vdem_coverage, DV_set)
-
-# ## dropped from gw
-# dropped_from_gw <- anti_join(GW_coverage, DV_set)
-# gwstates[gwstates$gwcode %in% dropped_from_gw$gwcode, c(1, 3)]
-
-# ## Which country-years are dropped
-# DV_coverage <- import("input/VDem_GW_DV_dataframe_1970.csv")%>%
-#     select(gwcode, year, country_name, country_text_id, country_id, any_neg_change)
-# dim(DV_coverage)
-
-# Vdem_template <- import("input/Vdem_template.csv")%>%
-#     select(gwcode, year, country_name, country_text_id, country_id, any_neg_change)
-# dim(Vdem_template)
-# # summary(Vdem_template)
-# # Vdem_template[Vdem_template$country_name == "Slovenia", ]
-
-# keep <- gwstates$gwcode[gwstates$microstate == FALSE]
-# GW_template <- state_panel(as.Date("1970-01-01"), as.Date(paste0(TARGET_YEAR, "-01-01")), by = "year", partial = "any", useGW = TRUE)%>%
-#     mutate(year = lubridate::year(date), date = NULL)%>%
-#         filter(gwcode %in% keep)
-
-# dropped_from_vdem_complete <- anti_join(Vdem_template, DV_coverage)
-# table(dropped_from_vdem_complete$year, dropped_from_vdem_complete$country_name)
-
-# dropped_from_gw_complete0 <- anti_join(GW_template, DV_coverage)
-# dropped_from_gw_complete <- left_join(dropped_from_gw_complete0, gwstates[gwstates$gwcode %in% dropped_from_gw_complete0$gwcode, c(1, 3)])
-# table(dropped_from_gw_complete$year, dropped_from_gw_complete$country_name)
-
-# ## WHat does the yearly distribution of the DV look like
-# Vdem_template[Vdem_template$any_neg_change == 1 & Vdem_template$year == 1986, ]
-
-# yearly_coverage <- table(Vdem_template$year, Vdem_template$any_neg_change)
-# barplot(yearly_coverage[, 2], width = 0.5, cex.names = 0.8)
-# # yearly_percent_dv <-
-# data.frame(any_neg_change = yearly_coverage[, 2], no_neg_change = yearly_coverage[, 1], percent_neg_change = round(yearly_coverage[, 2]/(yearly_coverage[, 1] + yearly_coverage[, 2]), 2))
-
-# # Percent DV
-# sum(DV_coverage$any_neg_change, na.rm = TRUE) / nrow(DV_coverage[!is.na(DV_coverage$any_neg_change), ])
-
-
-# }
+write_csv(part, sprintf("output/part-%s.csv", VERSION))
 
 
 

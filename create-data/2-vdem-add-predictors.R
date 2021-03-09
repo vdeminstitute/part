@@ -68,7 +68,8 @@ vdem_complete <- vdem_raw %>%
     v2x_liberal, v2xdl_delib, v2x_jucon, v2x_frassoc_thick, v2xel_frefair,
     v2x_elecoff, v2xlg_legcon, v2x_partip, v2x_cspart, v2x_egal, v2xeg_eqprotec,
     v2xeg_eqaccess, v2xeg_eqdr, v2x_diagacc, v2xex_elecleg, v2x_civlib,
-    v2x_clphy, v2x_clpol, v2x_clpriv, v2x_corr,
+    v2x_clphy, v2x_clpol, v2x_clpriv, v2x_corr, v2x_freexp_altinf, v2xcl_rol,
+    v2x_accountability, v2x_veracc, v2x_horacc, v2x_pubcorr, v2xcs_ccsi,
     v2x_EDcomp_thick, v2x_elecreg, v2x_freexp, v2x_gencl, v2x_gencs, v2x_hosabort, v2x_hosinter, v2x_rule, v2xcl_acjst,
     v2xcl_disc, v2xcl_dmove, v2xcl_prpty, v2xcl_slave, v2xel_elecparl, v2xel_elecpres, v2xex_elecreg, v2xlg_elecreg,
     v2ex_legconhog, v2ex_legconhos, v2x_ex_confidence, v2x_ex_direlect, v2x_ex_hereditary, v2x_ex_military, v2x_ex_party,
@@ -90,6 +91,8 @@ vdem_complete <- vdem_raw %>%
 dim(vdem_complete)
 # 8602 x 186
 
+# Rule-based imputations
+# Some variables are missing because for conceptual reasons; set these to 0
 vdem_clean_data <- vdem_complete %>%
   group_by(country_id) %>%
   arrange(year) %>%
@@ -161,21 +164,82 @@ if (FALSE) {
   View(probs)
 }
 
+#vdem_clean_data %>% filter(country_name=="Jamaica") %>% select(year, v2elrstrct) %>% View()
 vdem_clean_data <- vdem_clean_data %>%
   mutate(
-    v2elrsthos = ifelse(is.na(v2elrsthos) & country_name == "South Africa" & between(year, 2017, 2018), 1, v2elrsthos), ## Not sure why this is NA... It has been a 1 since 1993
-    v2elrsthos = ifelse(is.na(v2elrsthos) & country_name == "Haiti" & between(year, 2017, 2018), 1, v2elrsthos), ## Not sure why this is NA... All other years are 1
-    v2elrstrct = ifelse(is.na(v2elrstrct) & country_name == "Timor-Leste" & between(year, 2017, 2018), 1, v2elrstrct), ## Not sure why this is NA... All other years are
-    v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "Saudi Arabia" & between(year, 1970, 2018), -3.527593, v2psoppaut), ## Opposition parties are banned in Saudi Arabia. Going with the min score in the data (1970-2017)
-    v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "Kuwait" & between(year, 1970, 2018), -2.250289, v2psoppaut), ## Carry forward. has the same score 1970-2016
-    v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "Qatar" & between(year, 1971, 2018), -3.527593, v2psoppaut), ## Opposition parties are banned in Qatar. Going with the min score in the data (1970-2017)
-    v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "United Arab Emirates" & between(year, 1971, 2018), -3.527593, v2psoppaut), ## Opposition parties are banned in UAE. Going with the min score in the data (1970-2017)
-    v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "Oman" & between(year, 2000, 2018), -2.46780629, v2psoppaut), ## Carry forward. There are a handful of nominal opposition parties, but they are co-opted. No much changed after 1999...
+    # Opposition parties are banned in Saudi Arabia. Going with the min score in the data
+    v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "Saudi Arabia",
+                        min(v2psoppaut, na.rm = TRUE), v2psoppaut),
+    # Opposition parties are banned in Qatar. Going with the min score in the data
+    v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "Qatar",
+                        min(v2psoppaut, na.rm = TRUE), v2psoppaut),
+    # Opposition parties are banned in UAE. There's a single non-missing value in 2019, use that
+    v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "United Arab Emirates",
+                        -2.363, v2psoppaut),
+    # There's a single value for a couple of years, but with missing at head and tail;
+    # just set everything to that value
+    v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "Oman",
+                        -2.472, v2psoppaut),
+    # Jamaica; all other values are 1, set last two years to this as well
+    v2elrsthos = ifelse(is.na(v2elrsthos) & country_name == "Jamaica",
+                        1, v2elrsthos),
+    v2elrstrct = ifelse(is.na(v2elrstrct) & country_name == "Jamaica",
+                        1, v2elrstrct)
   )
 
 dim(vdem_clean_data)
 # v9:  8258 x 191
 # v11: 8602 x 190
+
+# There are still some missing values. Try two approaches:
+# (1) For any missing values preceded by 3 identical non-NA values, use that
+# (2) For any single missing value, use the previous observed value
+#
+
+# If a series is missing the last 1 or 2 values and the preceding 3 non-NA
+# values are the same, set it to that; this gets rid of some edge cases
+# where for some reason the last year in the data is missing
+imputer <- function(x) {
+  xx <- rle(x)
+  trail_na <- is.na(tail(xx$values, 1))
+  if (trail_na & length(xx$lengths) > 1) {
+    # check the preceding non-NA value occurred at least 3 times
+    # index for 2nd to last element
+    back2 <- length(xx$lengths) - 1
+    good <- xx$lengths[back2] > 2
+    if (good) {
+      x[(length(x) - tail(xx$lengths, 1) + 1):length(x)] <- xx$values[back2]
+    }
+  }
+  x
+}
+# all.equal(imputer(c(1, 1, 1, NA)), rep(1, 4))
+# all_equal(imputer(c(1, 1, NA)), c(1, 1, NA))
+vdem_clean_data <- vdem_clean_data %>%
+  group_by(country_id) %>%
+  mutate_at(vars(-group_cols()), imputer) %>%
+  ungroup()
+
+# impute single NA values with previous value
+# this catches a few leftovers for non-constant series
+imputer <- function(x) {
+  if (length(x) > 1) {
+    for (i in 2:length(x)) {
+      if (is.na(x[i]) & !is.na(x[i-1])) {
+        x[i] <- x[i-1]
+      }
+    }
+  }
+  x
+}
+vdem_clean_data <- vdem_clean_data %>%
+  group_by(country_id) %>%
+  mutate_at(vars(-group_cols()), imputer) %>%
+  ungroup()
+
+
+
+# Lag and transformations -------------------------------------------------
 
 vdem_clean_data_lagged <- vdem_clean_data %>%
   mutate(year = year + 1)
@@ -184,16 +248,15 @@ dim(vdem_clean_data_lagged)
 # v9:  8258 x 191
 # v11: 8602 x 190
 
-vdem_clean_data_lagged_diff <- vdem_clean_data_lagged %>%
-  group_by(country_id) %>%
-  arrange(year) %>%
-  mutate_at(vars(-c(country_name, country_text_id, gwcode, country_id, year, lagged_is_jud, lagged_is_leg, lagged_is_elec, lagged_is_election_year)), ~c(NA, diff(.))) %>%
-  ungroup() %>%
-  arrange(country_id, year) %>%
-  select(country_name, country_text_id, gwcode, country_id, year, lagged_is_jud, lagged_is_leg, lagged_is_elec, lagged_is_election_year, everything())
 
-names(vdem_clean_data_lagged_diff)[-c(1:9)] <- str_replace_all(names(vdem_clean_data_lagged)[-c(1:9)], "lagged_", "lagged_diff_year_prior_")
-# naCountFun(vdem_clean_data_lagged_diff, TARGET_YEAR)
+vdem_clean_data_lagged_diff <- vdem_clean_data_lagged %>%
+  pivot_longer(-c(country_name, country_text_id, gwcode, country_id, year, lagged_is_jud, lagged_is_leg, lagged_is_elec, lagged_is_election_year)) %>%
+  group_by(country_id, name) %>%
+  arrange(year) %>%
+  mutate(value = c(NA, diff(value))) %>%
+  pivot_wider()
+colnames(vdem_clean_data_lagged_diff) <- str_replace(
+  colnames(vdem_clean_data_lagged_diff), "lagged_", "lagged_diff_year_prior_")
 
 vdem_data <- vdem_clean_data_lagged %>%
   left_join(vdem_clean_data_lagged_diff)
@@ -211,7 +274,9 @@ vDem_GW_data <- VDem_GW_regime_shift_data %>%
 dim(vDem_GW_data)
 # v11: 8190 x 392
 
-naCountFun(vDem_GW_data, TARGET_YEAR + 1)
-naCountFun(vDem_GW_data, TARGET_YEAR)
+x <- naCountFun(vDem_GW_data, TARGET_YEAR + 1)
+x[x>0]
+x <- naCountFun(vDem_GW_data, TARGET_YEAR)
+x[x>0]
 
 saveRDS(vDem_GW_data, file = "output/vdem-augmented.rds")
