@@ -21,7 +21,7 @@
 # UPDATE: the first year of the 2-year period we want to forecast for
 # Note that this is different from demspaces.
 TARGET_YEAR <- 2021
-VERSION     <- "v9"
+VERSION     <- "v11"
 # The V-Dem data we use as input; should be correct automatically with VERSION
 VDEM_DATA <- sprintf("create-data/input/V-Dem-CY-Full+Others-%s.rds", VERSION)
 
@@ -324,8 +324,8 @@ data_signature <- function(df) {
     out$N_rows <- nrow(df)
     out$N_complete_rows <- sum(stats::complete.cases(df))
     out$Countries <- length(unique(df$gwcode))
-    out$Sum_any_neg_change <- sum(df$any_neg_change, na.rm = TRUE)
-    out$Sum_any_neg_change_2yr <- sum(df$any_neg_change_2yr, na.rm = TRUE)
+    out$Sum_any_neg_change <- as.integer(sum(df$any_neg_change, na.rm = TRUE))
+    out$Sum_any_neg_change_2yr <- as.integer(sum(df$any_neg_change_2yr, na.rm = TRUE))
     out$Columns <- as.list(colnames(df))
     out
 }
@@ -338,6 +338,6 @@ write_yaml(sig, sprintf("create-data/output/regime-shift-%s-signature.yml",
                         VERSION))
 write_yaml(sig, "create-data/output/regime-shift-signature.yml")
 
-export(VDem_GW_regime_shift_data, "create-data/output/VDem_GW_regime_shift_data_1970on.csv")
+write_csv(VDem_GW_regime_shift_data, "create-data/output/VDem-GW-regime-shift-data-1970on.csv")
 
 
