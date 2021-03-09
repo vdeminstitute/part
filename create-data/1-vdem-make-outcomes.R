@@ -338,6 +338,6 @@ write_yaml(sig, sprintf("create-data/output/regime-shift-%s-signature.yml",
                         VERSION))
 write_yaml(sig, "create-data/output/regime-shift-signature.yml")
 
-write_csv(VDem_GW_regime_shift_data, "create-data/output/VDem-GW-regime-shift-data-1970on.csv")
+write_csv(VDem_GW_regime_shift_data, "create-data/output/regime-shift-data-1970on.csv")
 
 
