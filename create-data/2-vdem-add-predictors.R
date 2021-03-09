@@ -127,20 +127,12 @@ vdem_clean_data <- vdem_complete %>%
          v2elpdcamp = ifelse(is.na(v2elpdcamp) & v2x_elecreg == 0, 0, v2elpdcamp),
          v2elpdcamp = ifelse(is.na(v2elpdcamp) & v2x_elecreg == 0, 0, v2elpdcamp),
          v2elmonref = ifelse(is.na(v2elmonref) & v2x_elecreg == 0, 0, v2elmonref),
-         v2elmonden = ifelse(is.na(v2elmonden) & v2x_elecreg == 0, 0, v2elmonden)) %>%#,
+         v2elmonden = ifelse(is.na(v2elmonden) & v2x_elecreg == 0, 0, v2elmonden)) %>%
   ungroup() %>%
   mutate(v2x_jucon = ifelse(is_jud == 0, 0, v2x_jucon),
          v2xlg_legcon = ifelse(is_leg == 0, 0, v2xlg_legcon),
          v2elmonref = ifelse(is.na(v2elmonref) & is_elec == 1, 0, v2elmonref),
          v2elmonden = ifelse(is.na(v2elmonden) & is_elec == 1, 0, v2elmonden),
-         v2elrsthos = ifelse(is.na(v2elrsthos) & country_name == "South Africa" & between(year, 2017, 2018), 1, v2elrsthos), ## Not sure why this is NA... It has been a 1 since 1993
-         v2elrsthos = ifelse(is.na(v2elrsthos) & country_name == "Haiti" & between(year, 2017, 2018), 1, v2elrsthos), ## Not sure why this is NA... All other years are 1
-         v2elrstrct = ifelse(is.na(v2elrstrct) & country_name == "Timor-Leste" & between(year, 2017, 2018), 1, v2elrstrct), ## Not sure why this is NA... All other years are
-         v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "Saudi Arabia" & between(year, 1970, 2018), -3.527593, v2psoppaut), ## Opposition parties are banned in Saudi Arabia. Going with the min score in the data (1970-2017)
-         v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "Kuwait" & between(year, 1970, 2018), -2.250289, v2psoppaut), ## Carry forward. has the same score 1970-2016
-         v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "Qatar" & between(year, 1971, 2018), -3.527593, v2psoppaut), ## Opposition parties are banned in Qatar. Going with the min score in the data (1970-2017)
-         v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "United Arab Emirates" & between(year, 1971, 2018), -3.527593, v2psoppaut), ## Opposition parties are banned in UAE. Going with the min score in the data (1970-2017)
-         v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "Oman" & between(year, 2000, 2018), -2.46780629, v2psoppaut), ## Carry forward. There are a handful of nominal opposition parties, but they are co-opted. No much changed after 1999...
          v2lgqstexp = ifelse(is_leg == 0, 0, v2lgqstexp),
          v2lginvstp = ifelse(is_leg == 0, 0, v2lginvstp),
          v2lgotovst = ifelse(is_leg == 0, 0, v2lgotovst),
@@ -152,6 +144,35 @@ vdem_clean_data <- vdem_complete %>%
          v2lgcomslo = ifelse(is_leg == 0, 0, v2lgcomslo),
          v2lgsrvlo =  ifelse(is_leg == 0, 0, v2lgsrvlo)) %>%
   select(country_name, country_text_id, gwcode, country_id, year, everything())
+
+# Country specific imputations
+# here are all the missing data points left:
+if (FALSE) {
+  probs <- vdem_clean_data %>%
+    filter(!complete.cases(.)) %>%
+    pivot_longer(-c(country_name, country_id, country_text_id, gwcode, year)) %>%
+    filter(is.na(value)) %>%
+    group_by(country_id, name) %>%
+    arrange(country_id, name, year) %>%
+    mutate(spell_id = id_date_sequence(year)) %>%
+    group_by(country_id, country_name, name, spell_id) %>%
+    summarize(years_missing = paste0(range(year), collapse = "-"), n = n()) %>%
+    select(-spell_id)
+  View(probs)
+}
+
+vdem_clean_data <- vdem_clean_data %>%
+  mutate(
+    v2elrsthos = ifelse(is.na(v2elrsthos) & country_name == "South Africa" & between(year, 2017, 2018), 1, v2elrsthos), ## Not sure why this is NA... It has been a 1 since 1993
+    v2elrsthos = ifelse(is.na(v2elrsthos) & country_name == "Haiti" & between(year, 2017, 2018), 1, v2elrsthos), ## Not sure why this is NA... All other years are 1
+    v2elrstrct = ifelse(is.na(v2elrstrct) & country_name == "Timor-Leste" & between(year, 2017, 2018), 1, v2elrstrct), ## Not sure why this is NA... All other years are
+    v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "Saudi Arabia" & between(year, 1970, 2018), -3.527593, v2psoppaut), ## Opposition parties are banned in Saudi Arabia. Going with the min score in the data (1970-2017)
+    v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "Kuwait" & between(year, 1970, 2018), -2.250289, v2psoppaut), ## Carry forward. has the same score 1970-2016
+    v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "Qatar" & between(year, 1971, 2018), -3.527593, v2psoppaut), ## Opposition parties are banned in Qatar. Going with the min score in the data (1970-2017)
+    v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "United Arab Emirates" & between(year, 1971, 2018), -3.527593, v2psoppaut), ## Opposition parties are banned in UAE. Going with the min score in the data (1970-2017)
+    v2psoppaut = ifelse(is.na(v2psoppaut) & country_name == "Oman" & between(year, 2000, 2018), -2.46780629, v2psoppaut), ## Carry forward. There are a handful of nominal opposition parties, but they are co-opted. No much changed after 1999...
+  )
+
 dim(vdem_clean_data)
 # v9:  8258 x 191
 # v11: 8602 x 190
