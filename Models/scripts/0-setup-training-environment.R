@@ -16,9 +16,9 @@ lapply(packs, library, character.only = TRUE)
 stopifnot(basename(getwd())=="Models")
 
 # which year to forecast for?
-TARGET_YEAR <- 2019
+TARGET_YEAR <- 2021
 # test forecast years
-TEST_FORECAST_YEARS <- 2011:2017  # this should be one less than TARGET_YEAR
+TEST_FORECAST_YEARS <- 2011:2019  # this should be one less than TARGET_YEAR
                                   # because any_neg_change_2yr looks ahead at
                                   # next year, but we don't know what
                                   # any_neg_change in
@@ -62,12 +62,12 @@ cnames <- gwstates %>%
 # Complete, non-missing data, except for the TARGET, which will be missing for the
 # last year.
 
-complete_data <- read_csv("input/ALL_data_final_USE_v9.csv")
+complete_data <- read_csv("input/part-v11.csv")
 # # take these out from training data
 id_cols <- c("gwcode", "year", "country_name", "country_text_id", "country_id",
              "v2x_regime", "v2x_regime_amb", "any_neg_change")
 
-drop_vars <- c("date", "lagged_v2x_regime_asCharacter", "lagged_v2x_regime_asFactor")
+drop_vars <- c("lagged_v2x_regime_asCharacter", "lagged_v2x_regime_asFactor")
 dim(complete_data)[2] - length(id_cols) - length(drop_vars)
 
 
@@ -79,7 +79,7 @@ missing_target_by_year <- complete_data %>%
 # check
 miss_years <- missing_target_by_year[missing_target_by_year$n > 0, "year"][[1]]
 if (any(miss_years!=TARGET_YEAR)) {
-  stop("Somethign is wrong with missing values in 'any_neg_change_2yr'")
+  stop("Something is wrong with missing values in 'any_neg_change_2yr'")
 }
 
 # Index for complete training data and forecast data (DV is missing)

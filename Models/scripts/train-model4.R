@@ -1,5 +1,5 @@
 #
-#   Model 4: Regularized logistic regresion (glmnet::glmnet(.., family = "binomial"))
+#   Model 4: Random forest
 #
 
 # to ID output files
@@ -22,34 +22,35 @@ manual_tuning <- function() {
     makeNumericParam("sample.fraction", lower = 0.25, upper = 1),
     makeIntegerParam("min.node.size", lower = 1L, upper = 200L)
   )
-  
+
   res <- tuneParams(
     learner    = makeLearner("classif.ranger", predict.type = "prob"),
     task       = full_task,
     par.set    = ps_rf,
     resampling = makeResampleDesc("CV", iters = TUNE_CV_FOLDS),
-    measures   = list(mlr::brier, mlr::timeboth), 
+    measures   = list(mlr::brier, mlr::timeboth),
     control    = makeTuneControlRandom(maxit = 200L)
   )
-  
+
   write_rds(res, path = "output/models/mdl4_tuning_results.rds")
-  
+
+  # res <- read_rds("output/models/mdl4_tuning_results.rds")
   # data = generateHyperParsEffectData(res, partial.dep = T)
-  # 
+  #
   # # sample.fraction 0.8 seems to be reasonable
   # plotHyperParsEffect(data, x = "sample.fraction", y = "logloss.test.mean",
   #                     plot.type = "line", partial.dep.learn = "regr.ranger") +
   #   geom_point(data = data$data, aes(x = sample.fraction, y = logloss.test.mean))
   # ggplot(data = data$data, aes(x = sample.fraction, y = timeboth.test.mean)) +
   #   geom_point() + geom_smooth()
-  # 
+  #
   # # around 500 trees?
   # plotHyperParsEffect(data, x = "num.trees", y = "logloss.test.mean",
   #                     plot.type = "line", partial.dep.learn = "regr.ranger") +
   #   geom_point(data = data$data, aes(x = num.trees, y = logloss.test.mean))
   # ggplot(data = data$data, aes(x = num.trees, y = timeboth.test.mean)) +
   #   geom_point() + geom_smooth()
-  # 
+  #
   # # the more the better, about 30 to 40
   # plotHyperParsEffect(data, x = "mtry", y = "logloss.test.mean",
   #                     plot.type = "line", partial.dep.learn = "regr.ranger") +
@@ -62,9 +63,9 @@ manual_tuning <- function() {
 }
 
 if (file.exists("output/models/mdl4_tuning_results.rds")) {
-  cv.fit <- read_rds("output/models/mdl4_tuning_results.rds")
+  tr <- read_rds("output/models/mdl4_tuning_results.rds")
 } else {
-  cv.fit <- manual_tuning()
+  tr <- manual_tuning()
 }
 
 # Parameter search space
@@ -75,11 +76,11 @@ ps_rf = makeParamSet(
 
 # Random forest with hyperparameter optimization via 10-fold CV over random grid
 auto_rf <- makeTuneWrapper(
-  learner    = makeLearner("classif.ranger", predict.type = "prob"), 
+  learner    = makeLearner("classif.ranger", predict.type = "prob"),
   par.set    = ps_rf,
   resampling = makeResampleDesc("CV", iters = TUNE_CV_FOLDS),
-  measures   = list(mlr::brier), 
-  control    = makeTuneControlRandom(maxit = RANDOM_TUNE_SAMPLES), 
+  measures   = list(mlr::brier),
+  control    = makeTuneControlRandom(maxit = RANDOM_TUNE_SAMPLES),
   show.info  = FALSE)
 
 
@@ -88,7 +89,7 @@ task    <- full_task
 
 
 #
-#   Cross-validation   
+#   Cross-validation
 #   ________________
 
 # Get OOS performance of model
@@ -117,14 +118,14 @@ test_forecasts <- test_forecast(learner, task, TEST_FORECAST_YEARS)
 write_rds(test_forecasts, path = sprintf("output/predictions/%s_test_forecasts.rds", model_prefix))
 
 
-# 
+#
 #   Live forecast
 #   ________________
 
 forecast_data <- split_data$fcast %>% select(-!!TARGET)
 fcast <- predict(mdl_full_data, newdata = as.data.frame(forecast_data))
 
-fcast <- bind_cols(split_data$fcast_ids[, c("gwcode", "country_name", "year")], 
+fcast <- bind_cols(split_data$fcast_ids[, c("gwcode", "country_name", "year")],
                    split_data$fcast[, TARGET, drop = FALSE],
                    fcast$data) %>%
   arrange(prob.1)
@@ -141,8 +142,8 @@ parallelStop()
 #   Process results / creates figures, performance tables, etc.
 #   ____________________________________
 #
-#   The behavior of the assess-model.R script depends on having the correct 
-#   model_prefix variable set at the beginning of this script. 
+#   The behavior of the assess-model.R script depends on having the correct
+#   model_prefix variable set at the beginning of this script.
 #
 
 source("scripts/assess-model.R")
