@@ -43,9 +43,6 @@ epr_dat <- read_csv("input/epr-yearly.csv", col_types = cols()) %>%
   filter(year < TARGET_YEAR) %>%
   mutate(year = year + TARGET_YEAR - max(year))
 names(epr_dat)[-c(1:2)] <- paste("lagged_", names(epr_dat)[-c(1:2)], sep = "")
-str(epr_dat)
-
-plotmiss(epr_dat)
 
 #
 #   GDP ----
@@ -162,12 +159,7 @@ VDem_GW_regime_shift_data %>%
             n = n()) %>%
   filter(n_miss_y > 0)
 
-# v11: missing for
-# South Yemen 1990
-# R of Vietnam 1975
-# GDR 1990
-# so, states that ceased to exist, in their last (partial) year
-# that seems fine
+# v11: missing 2020 and 2021
 
 
 # Merge all datasets ------------------------------------------------------

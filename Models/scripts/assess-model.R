@@ -18,7 +18,7 @@ source("R/functions.R")
 #   This relies on model_prefix to find relevant files
 #   This is already set in the train models scripts, but if running this
 #   script by itself, set it.
-model_prefix <- "mdl4"
+model_prefix <- "mdl2"
 
 if (!exists("model_prefix")) {
   stop("object 'model_prefix' is required but does not exist")
@@ -64,7 +64,7 @@ for (y in unique(test_forecasts$year)) {
     filter(year==y) %>%
     mutate(Pr1 = round(prob.1, 4)) %>%
     arrange(Pr1)%>%
-    left_join(dv_dat)
+    left_join(dv_dat, by = c("gwcode", "year"))
 
   perf_this_year <- bin_class_summary(test_forecasts_this_year$truth, test_forecasts_this_year$prob.1)
 
