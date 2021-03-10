@@ -8,6 +8,11 @@
 # to ID output files
 model_prefix <- "mdl6"
 
+library(here)
+library(lgr)
+
+setwd(here::here("Models"))
+
 # Load needed packages and setup global variables controlling model training
 source("scripts/0-setup-training-environment.R")
 # import functions
@@ -15,31 +20,11 @@ source("R/functions.R")
 
 preds_needed <- expand.grid(
   paste0("mdl", 3:5),
-  c("cv", "test", "live"),
+  c("test", "live"),
   "forecasts.rds"
 ) %>%
   apply(., 1, paste0, collapse = "_")
 
-
-#
-#   Cross-validation
-#   ________________
-
-# Get CV preds
-cv_preds <- dir("output/predictions", pattern = "[3-5]{1}_cv", full.names = TRUE) %>%
-  setNames(., nm = str_extract(., "mdl[0-9]{1}"))
-cv_preds <- cv_preds %>% map_dfr(read_rds, .id = "model")
-preds_oos <- cv_preds %>%
-  group_by(id) %>%
-  summarize(truth = unique(truth),
-            prob.0 = mean(prob.0),
-            prob.1 = mean(prob.1),
-            response = math_mode(response),
-            iter = NA,
-            set = "test")
-
-# Save artifacts
-write_rds(preds_oos, file = sprintf("output/predictions/%s_cv_preds.rds", model_prefix))
 
 
 #

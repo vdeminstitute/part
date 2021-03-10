@@ -6,14 +6,21 @@
 #   data.
 #
 
-packs <- c("tidyverse", "rio", "mlr", "glmnet", "here", "MLmetrics", "pROC",
-           "xtable", "futile.logger", "parallelMap", "e1071", "MLmetrics",
-           "doParallel", "states")
-# install.packages(packs, dependencies = TRUE)
-# install.packages("C:/Users/xricmo/Dropbox/VForecast/vfcast_0.0.1.tar.gz")
-lapply(packs, library, character.only = TRUE)
+library(tidyverse)
+library(dplyr)
+library(rio)
+library(mlr)
+library(glmnet)
+library(here)
+library(MLmetrics)
+library(pROC)
+library(xtable)
+library(parallelMap)
+library(e1071)
+library(doParallel)
+library(states)
 
-stopifnot(basename(getwd())=="Models")
+setwd(here::here("Models"))
 
 # which year to forecast for?
 TARGET_YEAR <- 2021
@@ -38,13 +45,6 @@ if (.Platform$OS.type == "windows") {
   parallelMap::parallelStartSocket(N_CORES)
 } else {
   parallelMap::parallelStartMulticore(cpus = N_CORES)
-}
-
-# Choose a resampling strategy
-if (CV_REPS == 1L) {
-  resample_strategy = makeResampleDesc("CV", iters = CV_FOLDS)
-} else {
-  resample_strategy = makeResampleDesc("RepCV", reps = CV_REPS, folds = CV_FOLDS)
 }
 
 

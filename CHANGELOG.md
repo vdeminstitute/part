@@ -3,6 +3,8 @@
 
 - Take out cross-validation fit exercises to speed up model runtime. 
 - Comparison of v9 and v11 positive cases. There are substantial differences. 
+- Tweaked RF model hyperparameter tuning based on tuning experiments; use 1000 trees but tune mtry, min.node.size, and sample.fraction.
+- Change glmnet tuning metric (model3) from logloss to brier (all others are brier).
 
 ### Add versioning system. 
 

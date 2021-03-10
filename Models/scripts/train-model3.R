@@ -1,11 +1,15 @@
 #
 #   Model 3: Regularized logistic regresion (glmnet::glmnet(.., family = "binomial"))
 #
+#   AB: running this for the 2021 update took about 1hr with 7 cores
+#
 
 # to ID output files
 model_prefix <- "mdl3"
 
 library(here)
+library(lgr)
+
 setwd(here::here("Models"))
 
 # Load needed packages and setup global variables controlling model training
@@ -48,7 +52,7 @@ ps <- makeParamSet(
 auto_glmnet <- makeTuneWrapper(
   learner    = makeLearner("classif.glmnet", predict.type = "prob"),
   resampling = makeResampleDesc("CV", iters = TUNE_CV_FOLDS),
-  measures   = list(mlr::logloss),
+  measures   = list(mlr::brier),
   par.set    = ps,
   control    = makeTuneControlRandom(maxit = RANDOM_TUNE_SAMPLES),
   show.info = TRUE
@@ -67,8 +71,8 @@ task    <- full_task
 #   _______________
 
 
+lgr$info("Running test forecast")
 test_forecasts <- test_forecast(learner, task, TEST_FORECAST_YEARS)
-
 write_rds(test_forecasts, file = sprintf("output/predictions/%s_test_forecasts.rds", model_prefix))
 
 
@@ -76,6 +80,8 @@ write_rds(test_forecasts, file = sprintf("output/predictions/%s_test_forecasts.r
 #   Live forecast
 #   ________________
 
+
+lgr$info("Running live forecast")
 # Estimate final version of model on full data
 mdl_full_data <- mlr::train(learner, task)
 write_rds(mdl_full_data, file = sprintf("output/models/%s_full_data.rds", model_prefix))
@@ -104,4 +110,5 @@ parallelStop()
 #   model_prefix variable set at the beginning of this script.
 #
 
+lgr$info("Models done, sourcing assessment script")
 source("scripts/assess-model.R")
