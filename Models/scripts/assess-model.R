@@ -3,18 +3,26 @@
 #   2019-02-20
 #
 
-packs <- c("tidyverse", "readr", "mlr", "glmnet", "here", "MLmetrics", "pROC",
-           "xtable", "futile.logger", "parallelMap", "e1071", "MLmetrics",
-           "doParallel", "states")
-# install.packages(packs, dependencies = TRUE)
-lapply(packs, library, character.only = TRUE)
+library(tidyverse)
+library(readr)
+library(mlr)
+library(glmnet)
+library(here)
+library(pROC)
+library(states)
+
+setwd(here("Models"))
 
 source("R/functions.R")
 
 #   This relies on model_prefix to find relevant files
 #   This is already set in the train models scripts, but if running this
 #   script by itself, set it.
-#model_prefix <- "mdl1"
+model_prefix <- "mdl4"
+
+if (!exists("model_prefix")) {
+  stop("object 'model_prefix' is required but does not exist")
+}
 
 plot_title <- switch(model_prefix,
                      mdl1 = "Base rate Model",
@@ -28,7 +36,7 @@ plot_title <- switch(model_prefix,
 #   Load needed data
 #   _________________
 
-# UPDATE:
+# UPDATE: part-vX
 dv_dat <- read_csv("input/part-v11.csv", col_types = cols())%>%
 	select(gwcode, year, any_neg_change)
 test_forecasts <- read_rds(sprintf("output/predictions/%s_test_forecasts.rds", model_prefix))
@@ -47,7 +55,7 @@ test_fcast_perf %T>%
   print()
 
 p <- ggsepplot(test_forecasts$truth, test_forecasts$prob.1)
-ggsave(sprintf("output/figures/%s-sepplot-test-forecsts.pdf", model_prefix), plot = p, height = 2, width = 8)
+ggsave(sprintf("output/figures/%s-sepplot-test-forecsts.png", model_prefix), plot = p, height = 2, width = 8)
 
 # Yearly check plots
 for (y in unique(test_forecasts$year)) {
@@ -60,7 +68,7 @@ for (y in unique(test_forecasts$year)) {
 
   perf_this_year <- bin_class_summary(test_forecasts_this_year$truth, test_forecasts_this_year$prob.1)
 
-  BaseSepPlotsFun(sprintf("output/figures/%s-%s-yearly-check.pdf", model_prefix, y),
+  BaseSepPlotsFun(sprintf("output/figures/%s-%s-yearly-check.png", model_prefix, y),
                   threshold = 0.05,
                   year = y,
                   N = 34,
@@ -86,9 +94,9 @@ live_forecasts <- live_forecasts%>%
     arrange(Pr1)
 
 
-BaseSepPlotsFun_live(sprintf("output/figures/%s-live-forecast.pdf", model_prefix),
+BaseSepPlotsFun_live(sprintf("output/figures/%s-live-forecast.png", model_prefix),
 					# threshold = 0.1,
-					year = 2018,
+					year = max(live_forecasts$year),
 					N = 34,
 					preds = live_forecasts$Pr1,
 					country_names = live_forecasts$country_name,

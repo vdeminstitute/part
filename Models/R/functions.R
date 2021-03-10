@@ -115,7 +115,7 @@ ggsepplot <- function(y, phat, outcome = "Y") {
 roundToTenth <- function(x){ceiling(x * 10) / 10}
 
 BaseSepPlotsFun <- function(file_path = NULL, threshold = 0.1, year, N, preds, truth, any_neg_change, country_names, model_name, kappa_score, auc_pr_score, brier_score){
-    onset_colors <- c("#B1A6FE80", "#0496F0", "#320397") 
+    onset_colors <- c("#B1A6FE80", "#0496F0", "#320397")
     accepted <- preds[preds >= threshold]
     tot_above <- length(accepted)
     tot_onset_2yr <- sum(as.numeric(as.character(truth)))
@@ -132,7 +132,7 @@ BaseSepPlotsFun <- function(file_path = NULL, threshold = 0.1, year, N, preds, t
     recall <- round(TP/(TP+FN), 3)
     year2 <- year + 1 - 2000
     year_string <- paste(year, year2, sep = "-")
-    pdf(file_path, width = 8.5, height = 6)
+    png(file_path, width = 8.5, height = 6, units = "in", res = 650)
     par(mfrow = c(1, 2))
     plot.new()
     mtext(paste("Estimated Risk of ART for ", year_string, " using ", model_name, sep = ""), side = 3, line = -1, outer = TRUE, font = 2)
@@ -191,7 +191,7 @@ BaseSepPlotsFun_live <- function(file_path = NULL, year, N, preds, country_names
     o <- order(preds, decreasing = TRUE)
     year2 <- year + 1 - 2000
     year_string <- paste(year, year2, sep = "-")
-    pdf(file_path, width = 8.5, height = 6)
+    png(file_path, width = 8.5, height = 6, units = "in", res = 650)
     par(mfrow = c(1, 2))
     plot.new()
     mtext(paste("Estimated Risk of ART for ", year_string, " using ", model_name, sep = ""), side = 3, line = -1, outer = TRUE, font = 2)
@@ -218,7 +218,7 @@ BaseSepPlotsFun_live <- function(file_path = NULL, year, N, preds, country_names
     dev.off()
 }
 
-  
+
 
 #' Mode
 #'
@@ -231,7 +231,7 @@ math_mode <- function(x) {
 
 BasePlotTestLiveFun <- function(file_path = NULL, year, year_live, N, preds, truth, any_neg_change, preds_live, colors_live, country_names, country_names_live, model_name, kappa_score, auc_pr_score, brier_score){
     cex_labels <- 1.5
-    onset_colors <- c("#CFCAF4", "#0496F0", "#320397") 
+    onset_colors <- c("#CFCAF4", "#0496F0", "#320397")
     year2 <- year + 1
     year_string <- paste(year, year2, sep = "-")
     png(file_path, width = 20, height = 10, units = "in", res = 650)
@@ -295,4 +295,3 @@ BasePredPlotsFun_live <- function(file_path = NULL, year, N, preds, country_name
     dev.off()
 }
 
-  
