@@ -44,7 +44,7 @@ part <- part[part$year < 2011, ]
 tune_grid <- tibble(
   row = 1:TUNE_N,
   num.trees       = as.integer(runif(TUNE_N, min = 5, max = 20.99))*100,
-  mtry            = as.integer(runif(TUNE_N, min = 5, max = 80)),
+  mtry            = as.integer(runif(TUNE_N, min = 5, max = 120)),
   min.node.size   = as.integer(runif(TUNE_N, min = 1, max = 20)),
   sample.fraction = runif(TUNE_N, min = 0.5, max = 1),
   cost = list(NULL)
