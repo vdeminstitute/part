@@ -211,7 +211,7 @@ BaseSepPlotsFun_live <- function(file_path = NULL, year, N, preds, country_names
     onset_colorsN <-  onset_colors[o][1:N]
 
     plot.window(xlim = c(0, max(roundToTenth(predsN)) + 0.1), ylim = c(1, length(predsN)))
-    barplot(sort(predsN), horiz = TRUE, col = rev(onset_colorsN), las = 2, axes = FALSE,
+    barplot(rev(predsN), horiz = TRUE, col = rev(onset_colorsN), las = 2, axes = FALSE,
       mar = c(0, 10, 3, 2), cex.names = 0.7, space = 0.25, xlim = c(0, max(roundToTenth(predsN)) + 0.1))
     axis(3, at = seq(0, max(roundToTenth(predsN) + 0.05), by = 0.05), cex.axis = 0.7)
     mtext(paste("Top ", N, " Countries", sep = ""), side = 3, line = 2)
