@@ -1,7 +1,7 @@
 #
 #   Model 4: Random forest
 #
-#   AB: mark runtime
+#   AB: for v11, it took 4.5 hours to run with 7 cores
 #
 
 # to ID output files
@@ -39,7 +39,7 @@ manual_tuning <- function() {
     control    = makeTuneControlRandom(maxit = 200L)
   )
 
-  write_rds(res, path = "output/models/mdl4_tuning_results.rds")
+  write_rds(res, file = "output/models/mdl4_tuning_results.rds")
 
   # res <- read_rds("output/models/mdl4_tuning_results.rds")
   # data = generateHyperParsEffectData(res, partial.dep = T)
@@ -103,7 +103,7 @@ task    <- full_task
 
 lgr$info("Running test forecasts")
 test_forecasts <- test_forecast(learner, task, TEST_FORECAST_YEARS)
-write_rds(test_forecasts, path = sprintf("output/predictions/%s_test_forecasts.rds", model_prefix))
+write_rds(test_forecasts, file = sprintf("output/predictions/%s_test_forecasts.rds", model_prefix))
 
 
 #
@@ -114,7 +114,7 @@ write_rds(test_forecasts, path = sprintf("output/predictions/%s_test_forecasts.r
 lgr$info("Running live forecast")
 # Estimate final version of model on full data
 mdl_full_data <- mlr::train(learner, task)
-write_rds(mdl_full_data, path = sprintf("output/models/%s_full_data.rds", model_prefix))
+write_rds(mdl_full_data, file = sprintf("output/models/%s_full_data.rds", model_prefix))
 
 forecast_data <- split_data$fcast %>% select(-!!TARGET)
 fcast <- predict(mdl_full_data, newdata = as.data.frame(forecast_data))
