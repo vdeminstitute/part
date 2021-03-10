@@ -61,9 +61,7 @@ gdp_dat <- read_csv("input/gdp.csv", col_types = cols()) %>%
         gdp_log = log(gdp),
         gdp_pc_log = log(gdp_pc))
 names(gdp_dat)[-c(1:2)] <- paste("lagged_", names(gdp_dat)[-c(1:2)], sep = "")
-str(gdp_dat)
 
-plotmiss(gdp_dat)
 
 #
 #   State age ----
@@ -73,9 +71,6 @@ age_dat <- read_csv("input/gwstate-age.csv", col_types = cols()) %>%
   filter(year < TARGET_YEAR) %>%
   mutate(year = year + TARGET_YEAR - max(year))
 names(age_dat)[-c(1:2)] <- paste("lagged_", names(age_dat)[-c(1:2)], sep = "")
-str(age_dat)
-
-plotmiss(age_dat)
 
 
 #
@@ -88,9 +83,6 @@ pop_dat <- read_csv("input/population.csv", col_types = cols()) %>%
   # log this sucker
   mutate(pop = log(pop))
 names(pop_dat)[-c(1:2)] <- paste("lagged_", names(pop_dat)[-c(1:2)], sep = "")
-str(pop_dat)
-
-plotmiss(pop_dat)
 
 
 #
@@ -102,9 +94,6 @@ coup_dat <- read_csv("input/ptcoups.csv", col_types = cols()) %>%
   select(-c(pt_failed_total, pt_failed_num5yrs, pt_failed_num10yrs))%>%
   mutate(year = year + TARGET_YEAR - max(year))
 names(coup_dat)[-c(1:2)] <- paste("lagged_", names(coup_dat)[-c(1:2)], sep = "")
-str(coup_dat)
-
-plotmiss(coup_dat)
 
 
 #
@@ -116,9 +105,6 @@ acd_dat <- read_csv("input/acd.csv", col_types = cols()) %>%
   select(gwcode, year, everything()) %>%
   mutate(year = year + pmax(0, TARGET_YEAR - max(year)))
 names(acd_dat)[-c(1:2)] <- paste("lagged_", names(acd_dat)[-c(1:2)], sep = "")
-str(acd_dat)
-
-plotmiss(acd_dat)
 
 
 #
@@ -131,9 +117,6 @@ infmort <- read_csv("input/wdi-infmort.csv", col_types = cols()) %>%
   select(gwcode, year, everything()) %>%
   mutate(year = year + pmax(0, TARGET_YEAR - max(year)))
 names(infmort)[-c(1:2)] <- paste("lagged_", names(infmort)[-c(1:2)], sep = "")
-str(infmort)
-
-plotmiss(infmort)
 
 
 #
@@ -146,9 +129,6 @@ ict <- read_csv("input/wdi-ict.csv", col_types = cols()) %>%
   select(gwcode, year, everything()) %>%
   mutate(year = year + pmax(0, TARGET_YEAR - max(year)))
 names(ict)[-c(1:2)] <- paste("lagged_", names(ict)[-c(1:2)], sep = "")
-str(ict)
-
-plotmiss(ict)
 
 
 #
@@ -159,7 +139,7 @@ plotmiss(ict)
 VDem_GW_regime_shift_data <- read_rds("output/vdem-augmented.rds")
 dim(VDem_GW_regime_shift_data)
 # v9:  7923 x 408
-# v11: 8190 x 392
+# v11: 8190 x 410
 naCountFun(VDem_GW_regime_shift_data, TARGET_YEAR + 1)
 
 VDem_GW_regime_shift_data <- VDem_GW_regime_shift_data %>%
@@ -169,9 +149,8 @@ VDem_GW_regime_shift_data <- VDem_GW_regime_shift_data %>%
 # here it's ok if we have up to target year
 range(VDem_GW_regime_shift_data$year)
 if (max(VDem_GW_regime_shift_data$year)!=TARGET_YEAR) stop("something wrong with VDem")
-plotmiss(VDem_GW_regime_shift_data)
 
-# missing y should only be for last year
+# missing y should only be for last 2 years
 VDem_GW_regime_shift_data %>%
   # filter out countries that are entirely missing
   group_by(gwcode) %>%
@@ -183,7 +162,12 @@ VDem_GW_regime_shift_data %>%
             n = n()) %>%
   filter(n_miss_y > 0)
 
-
+# v11: missing for
+# South Yemen 1990
+# R of Vietnam 1975
+# GDR 1990
+# so, states that ceased to exist, in their last (partial) year
+# that seems fine
 
 
 # Merge all datasets ------------------------------------------------------
@@ -275,7 +259,7 @@ part <- VDem_GW_regime_shift_data %>%
   ungroup() %>%
   arrange(country_id, year)
 
-colmiss <- naCountFun(part, TARGET_YEAR)
+colmiss <- naCountFun(part, (TARGET_YEAR - 1))
 colmiss
 if (any(colmiss > 0)) stop("Something is wrong, some columns have missing values")
 

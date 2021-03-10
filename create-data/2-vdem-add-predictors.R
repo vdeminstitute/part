@@ -189,7 +189,7 @@ vdem_clean_data <- vdem_clean_data %>%
 
 dim(vdem_clean_data)
 # v9:  8258 x 191
-# v11: 8602 x 190
+# v11: 8602 x 197
 
 # There are still some missing values. Try two approaches:
 # (1) For any missing values preceded by 3 identical non-NA values, use that
@@ -246,7 +246,7 @@ vdem_clean_data_lagged <- vdem_clean_data %>%
 names(vdem_clean_data_lagged)[-c(1:5)] <- paste("lagged_", names(vdem_clean_data_lagged)[-c(1:5)], sep = "")
 dim(vdem_clean_data_lagged)
 # v9:  8258 x 191
-# v11: 8602 x 190
+# v11: 8602 x 197
 
 
 vdem_clean_data_lagged_diff <- vdem_clean_data_lagged %>%
@@ -261,7 +261,7 @@ colnames(vdem_clean_data_lagged_diff) <- str_replace(
 vdem_data <- vdem_clean_data_lagged %>%
   left_join(vdem_clean_data_lagged_diff)
 dim(vdem_data)
-# v11: 8602 x 371
+# v11: 8602 x 389
 # naCountFun(vdem_data, TARGET_YEAR)
 
 vDem_GW_data <- VDem_GW_regime_shift_data %>%
@@ -276,7 +276,9 @@ dim(vDem_GW_data)
 
 x <- naCountFun(vDem_GW_data, TARGET_YEAR + 1)
 x[x>0]
+# multiple missing for TARGET_YEAR
 x <- naCountFun(vDem_GW_data, TARGET_YEAR)
 x[x>0]
+# any_neg_change_2yr should be missing for TARGET_YEAR - 1
 
 saveRDS(vDem_GW_data, file = "output/vdem-augmented.rds")

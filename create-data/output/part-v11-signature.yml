@@ -4,7 +4,7 @@ N_countries: 174
 Years: 1970 - 2021
 N_columns: 465
 N_rows: 8190
-N_complete_rows: 8021
+N_complete_rows: 7856
 Countries: 174
 Sum_any_neg_change: 164
 Sum_any_neg_change_2yr: 318
@@ -12,7 +12,6 @@ Columns:
 - gwcode
 - year
 - country_name
-- country_text_id
 - country_id
 - any_neg_change
 - any_neg_change_2yr
@@ -34,6 +33,7 @@ Columns:
 - lagged_was_neg_change_last_3yrs
 - lagged_was_neg_change_last_5yrs
 - lagged_was_neg_change_last_10yrs
+- country_text_id
 - lagged_v2x_polyarchy
 - lagged_v2x_liberal
 - lagged_v2xdl_delib
