@@ -3,7 +3,7 @@
 #   2019-02-20
 #
 
-packs <- c("tidyverse", "rio", "mlr", "glmnet", "here", "MLmetrics", "pROC",
+packs <- c("tidyverse", "readr", "mlr", "glmnet", "here", "MLmetrics", "pROC",
            "xtable", "futile.logger", "parallelMap", "e1071", "MLmetrics",
            "doParallel", "states")
 # install.packages(packs, dependencies = TRUE)
@@ -29,7 +29,7 @@ plot_title <- switch(model_prefix,
 #   _________________
 
 # UPDATE:
-dv_dat <- import("input/part-v11.csv")%>%
+dv_dat <- read_csv("input/part-v11.csv", col_types = cols())%>%
 	select(gwcode, year, any_neg_change)
 test_forecasts <- read_rds(sprintf("output/predictions/%s_test_forecasts.rds", model_prefix))
 live_forecasts <- read_rds(sprintf("output/predictions/%s_live_forecast.rds", model_prefix))
