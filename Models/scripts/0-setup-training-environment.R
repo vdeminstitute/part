@@ -76,12 +76,12 @@ missing_target_by_year <- complete_data %>%
   group_by(year) %>%
   summarize(n = sum(is.na(any_neg_change_2yr)))
 
-# check
-miss_years <- missing_target_by_year[missing_target_by_year$n > 0, "year"][[1]]
-if (any(miss_years!=TARGET_YEAR)) {
-  stop("Something is wrong with missing values in 'any_neg_change_2yr'")
-}
-
+# # check
+# miss_years <- missing_target_by_year[missing_target_by_year$n > 0, "year"][[1]]
+# if (any(miss_years!=TARGET_YEAR)) {
+#   stop("Something is wrong with missing values in 'any_neg_change_2yr'")
+# }
+#
 # Index for complete training data and forecast data (DV is missing)
 train_idx <- complete.cases(complete_data)
 fcast_idx <- complete_data$year %in% missing_target_by_year$year[missing_target_by_year$n > 0]

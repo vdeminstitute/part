@@ -5,6 +5,8 @@
 # to ID output files
 model_prefix <- "mdl5"
 
+# install.packages("xgboost", dependencies = TRUE)
+
 library(here)
 library(lgr)
 
