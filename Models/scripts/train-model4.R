@@ -35,7 +35,7 @@ manual_tuning <- function() {
     task       = full_task,
     par.set    = ps_rf,
     resampling = makeResampleDesc("CV", iters = TUNE_CV_FOLDS),
-    measures   = list(mlr::brier, mlr::timeboth),
+    measures   = list(mlr::brier),
     control    = makeTuneControlRandom(maxit = 200L)
   )
 

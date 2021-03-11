@@ -32,12 +32,9 @@ TEST_FORECAST_YEARS <- 2011:2019  # this should be one less than TARGET_YEAR
 TARGET <- "any_neg_change_2yr"
 
 # Model training settings
-CV_REPS       <- 2L
-CV_FOLDS      <- 7L
 TUNE_CV_FOLDS <- 7L
 # How many samples to take for random tune grids?
 RANDOM_TUNE_SAMPLES <- 21L
-ACC_MEASURES <- list(mlr::brier, mlr::auc, mlr::timeboth)
 N_CORES      <- 7L
 
 # Make it parallel ?parallel
