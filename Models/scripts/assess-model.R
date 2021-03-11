@@ -3,6 +3,9 @@
 #   2019-02-20
 #
 
+# UPDATE: what version of V-Dem is this set of forecasts using?
+VERSION = "v11"
+
 library(tidyverse)
 library(readr)
 library(mlr)
@@ -18,7 +21,7 @@ source("R/functions.R")
 #   This relies on model_prefix to find relevant files
 #   This is already set in the train models scripts, but if running this
 #   script by itself, set it.
-model_prefix <- "mdl2"
+#model_prefix <- "mdl3"
 
 if (!exists("model_prefix")) {
   stop("object 'model_prefix' is required but does not exist")
@@ -36,8 +39,7 @@ plot_title <- switch(model_prefix,
 #   Load needed data
 #   _________________
 
-# UPDATE: part-vX
-dv_dat <- read_csv("input/part-v11.csv", col_types = cols())%>%
+dv_dat <- read_csv(sprintf("input/part-%s.csv", VERSION), col_types = cols())%>%
 	select(gwcode, year, any_neg_change)
 test_forecasts <- read_rds(sprintf("output/predictions/%s_test_forecasts.rds", model_prefix))
 live_forecasts <- read_rds(sprintf("output/predictions/%s_live_forecast.rds", model_prefix))

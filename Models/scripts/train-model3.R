@@ -48,21 +48,12 @@ ps <- makeParamSet(
   makeNumericParam("s", lower = lambda_range[1], upper = lambda_range[2])
 )
 
-# GLMNET with lambda and alpha selection via CV over random search grid
-auto_glmnet <- makeTuneWrapper(
-  learner    = makeLearner("classif.glmnet", predict.type = "prob"),
-  resampling = makeResampleDesc("CV", iters = TUNE_CV_FOLDS),
-  measures   = list(mlr::brier),
-  par.set    = ps,
-  control    = makeTuneControlRandom(maxit = RANDOM_TUNE_SAMPLES),
-  show.info = TRUE
-)
-
 # since glmnet includes an intercept, for dummy features we need to drop a
 # reference column
 full_task = dropFeatures(full_task, "lagged_v2x_regime_amb.0")
 
-learner <- auto_glmnet
+learner <- makeLearner("classif.glmnet", predict.type = "prob",
+                       alpha = 0.5, s = 0.01341932)
 task    <- full_task
 
 
