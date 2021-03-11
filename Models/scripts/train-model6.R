@@ -8,6 +8,9 @@
 # to ID output files
 model_prefix <- "mdl6"
 
+# UPDATE: what version of V-Dem is this set of forecasts using?
+VERSION = "v11"
+
 library(here)
 library(lgr)
 
@@ -60,6 +63,14 @@ fcast <- fcast_preds %>%
             response = math_mode(response))
 
 write_rds(fcast, sprintf("output/predictions/%s_live_forecast.rds", model_prefix))
+
+# write a csv version to the archive as well
+fcast %>%
+  mutate(for_years = paste0(year, " - ", year + 1),
+         prob = prob.1) %>%
+  select(gwcode, country_name, year, for_years, prob) %>%
+  arrange(desc(prob)) %>%
+  write_csv(here(sprintf("archive/forecasts-%s.csv", VERSION)))
 
 #
 #   Cleanup
