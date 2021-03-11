@@ -1,3 +1,9 @@
+#
+#   Write a summary of the models' accuracy
+#
+
+# UPDATE:
+VERSION <- "v11"
 
 library("readr")
 library("purrr")
@@ -5,8 +11,8 @@ library("readr")
 library("tidyr")
 library("dplyr")
 
-all_perf <- dir("output/performance", 
-                pattern = "mdl[0-9]+[a-z-]+performance.csv", 
+all_perf <- dir("output/performance",
+                pattern = "mdl[0-9]+[a-z-]+performance.csv",
                 full.names = TRUE) %>%
   # so that dfr id is not just index
   setNames(., .) %>%
@@ -32,26 +38,22 @@ all_perf <- dir("output/performance",
   )) %>%
   select(-file_path)
 
-cv_perf <- all_perf %>%
-  filter(set=="CV") %>%
-  spread(measure, value) %>%
-  arrange(model) %>%
-  select(name, model, Brier, AUC_ROC, AUC_PR, Kappa, trained_on)#, everything()) ## Accuracy, 
-cv_perf
-
-write_csv(cv_perf, "output/tables/cv_perf.csv")
-# 2019-11-15, AB: this is a relic from the dropbox past, see PART repo
-#write_csv(cv_perf, "../Paper/data/cv_perf.csv")
-
 
 test_perf <- all_perf %>%
   filter(set=="test forecasts") %>%
   spread(measure, value) %>%
   arrange(model) %>%
-  select(name, model, Brier, AUC_ROC, AUC_PR, Kappa, trained_on)#, everything()) ## Accuracy, 
+  select(name, model, Brier, AUC_ROC, AUC_PR, Kappa, trained_on)#, everything()) ## Accuracy,
 test_perf
 
-write_csv(test_perf, "output/tables/test_perf.csv")
+write_csv(test_perf, "output/tables/test-perf.csv")
 
-# 2019-11-15, AB: ditto, relic
-#write_csv(test_perf, "../Paper/data/test_perf.csv")
+test_perf %>%
+  knitr::kable("markdown", digits = 3) %>%
+  writeLines("output/tables/test-perf.md")
+
+# keep a record too
+test_perf %>%
+  knitr::kable("markdown", digits = 3) %>%
+  writeLines(sprintf("output/tables/test-perf-%s.md", VERSION))
+
