@@ -12,8 +12,10 @@ function(input, output, session) {
                   highlightOptions = highlightOptions(color = "#28576B", weight = 1.5, bringToFront = TRUE))%>%
       setView(lng = 12, lat = 35, zoom = 2)%>%
       setMaxBounds(lng1 = -260, lat1 = -55.90223, lng2 = 360, lat2 = 83.11387)%>%
-      addLegend(position = "bottomleft",
-        title = "Estimated Risk 2019-20",
+      addLegend(
+        position = "bottomleft",
+        # UPDATE: years
+        title = "Estimated Risk 2021-22",
         opacity = 1,
         labels = c("< 5%", "< 10%", "< 20%", "< 25%", ">= 25%", "Closed Autocracy"),
         colors = c("#fef0d9","#fdcc8a","#fc8d59", "#e34a33", "#b30000", "#D0D0D1"))
@@ -34,18 +36,18 @@ function(input, output, session) {
     country_name <- input$countrySelect
     dat0 <- GW_shp_file_data[GW_shp_file_data$country_name == country_name, ]
     center_lon <- dat0%>%
-          pull(center_lon)%>%
-          as.matrix(.)
+      pull(center_lon)%>%
+      as.matrix(.)
     center_lat <- dat0%>%
-          pull(center_lat)%>%
-          as.matrix(.)
+      pull(center_lat)%>%
+      as.matrix(.)
     popUp_text <- dat0%>%
-          pull(popUp_text)
+      pull(popUp_text)
 
     proxy <- leafletProxy("map1")%>%
-    clearPopups()%>%
-    addPopups(lng = center_lon, lat = center_lat, popup = popUp_text)%>%
-    setView(lng = center_lon, lat = center_lat, zoom = input$map1_zoom)
+      clearPopups()%>%
+      addPopups(lng = center_lon, lat = center_lat, popup = popUp_text)%>%
+      setView(lng = center_lon, lat = center_lat, zoom = input$map1_zoom)
     if(country_name != ""){
       output$dataTable <- renderTable({extended_row_dat[extended_row_dat$country_name == country_name, c("year", "Extended RoW Classification")]}, width = "auto")
       output$ROWclass <- renderText({paste("Current Extended RoW Classification: ", extended_row_dat[extended_row_dat$country_name == country_name & extended_row_dat$year == 2018, c("Extended RoW Classification")], sep ="")})
@@ -70,5 +72,5 @@ function(input, output, session) {
     }
   })
 
-  output$hcbarplot <-  renderHighchart({topNriskFun(bar_plot_dat, N)})
+  output$hcbarplot <-  renderHighchart({topNriskFun(bar_plot_dat)})
 }
