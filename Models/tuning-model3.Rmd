@@ -1,0 +1,70 @@
+---
+title: "Tuning results for glmnet (model 3)"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(tidyr)
+  library(here)
+})
+
+
+perf <- readRDS(here::here("Models/output/tuning/model3-tuning.rds"))
+
+# overall best performance for each measure?
+perf %>%
+  pivot_longer(cols = -c(alpha, lambda_criterion, lambda, non_zero)) %>%
+  group_by(name) %>%
+  mutate(
+    min_value = min(value),
+    max_value = max(value),
+    optim_value = case_when(
+    name %in% c("mse", "Brier", "Logloss", "time") ~ min(value),
+    TRUE ~ max(value))
+  ) %>%
+  filter(value==optim_value)
+
+# this tends to pick min, what if we look at 1se?
+perf %>%
+  pivot_longer(cols = -c(alpha, lambda_criterion, lambda, non_zero)) %>%
+  filter(lambda_criterion=="1se") %>%
+  group_by(name) %>%
+  mutate(
+    min_value = min(value),
+    max_value = max(value),
+    optim_value = case_when(
+      name %in% c("mse", "Brier", "Logloss", "time") ~ min(value),
+      TRUE ~ max(value))
+  ) %>%
+  filter(value==optim_value)
+
+# alpha really cuts down time below 1
+plot(perf$alpha, perf$time, ylim = c(0, max(perf$time)))
+plot(perf$alpha, perf$mse, ylim = c(0, max(perf$mse)))
+plot(perf$alpha, perf$Brier, ylim = c(0, max(perf$Brier)))
+plot(perf$alpha, perf$Logloss, ylim = c(0, max(perf$Logloss)))
+plot(perf$alpha, perf$AUC_PR, ylim = c(0, max(perf$AUC_PR)))
+plot(perf$alpha, perf$non_zero, ylim = c(0, max(perf$non_zero)))
+# the 1se lambda cuts non-zero coefs down to <20, from ~80.
+# otherwise lower values of alpha don't seem to really impact performance that
+# much.
+# So, pick a low value of alpha to speed up training and call it a day,
+# take the lambda values from that, and I would say average them so that
+# we get a few more non-zero coefs.
+plot(perf$lambda, perf$non_zero)
+
+pick <- perf %>%
+  filter(alpha==0.5) %>%
+  summarize(alpha = unique(alpha), lambda = mean(lambda)) %>%
+  as.list()
+pick
+
+
+```
+

@@ -2,7 +2,7 @@
 #   Write a summary of the models' accuracy
 #
 
-# UPDATE:
+# UPDATE: mark the summary table with version number
 VERSION <- "v11"
 
 library("readr")
