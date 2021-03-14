@@ -7,7 +7,7 @@
 #
 
 
-TUNE_N  <- 5
+TUNE_N  <- 100
 WORKERS <- 7
 
 library(dplyr)
@@ -51,15 +51,15 @@ part <- part[part$year < 2011, ]
 
 tune_grid <- tibble(
   # Number of boosting rounds
-  nrounds = as.integer(round(runif(TUNE_N, min = 2, max = 100))),
+  nrounds = as.integer(round(runif(TUNE_N, min = 2, max = 150))),
   # Step size shrinkage; default 0.3, [0, 1]
   eta = runif(TUNE_N, min = 0, max = 1),
   # Minimum loss reduction to grow leaf node; default 0, [0, Inf]
   gamma = 0,
   # Maximum tree depth; default 6, [0, Inf]
-  max_depth = as.integer(runif(TUNE_N, min = 2, max = 10)),
+  max_depth = as.integer(runif(TUNE_N, min = 2, max = 20)),
   # Minimum sum of instance weight (hessian) needed in a child; default 1, [0, Inf]
-  min_child_weight = runif(TUNE_N, 0.5, 1),
+  min_child_weight = runif(TUNE_N, 0.5, 5),
   # Maximum delta step for each leaf node; default 0, [1, 10] for imbalanced
   max_delta_step = runif(TUNE_N, 0, 10),
   # Sampling for each round; default 1, [0, 1]
@@ -115,8 +115,12 @@ one_model <- function(data, hp, id_cols, target = "any_neg_change_2yr",
   test_y <- data[out_sample, ][[target]]
   dtest <- xgb.DMatrix(data = as.matrix(test_x), label = test_y)
 
+  # nrounds needs to be passed outside of the params list
+  nr <- hp[["nrounds"]]
+  hp$nrounds <- NULL
+
   mdl <- xgb.train(data = dtrain, objective = "binary:logistic",
-                   nrounds = hp[["nrounds"]],
+                   nrounds = nr,
                    params = hp)
 
   data.frame(obs = test_y, pred1 = predict(mdl, newdata = dtest))
@@ -158,12 +162,15 @@ tune_grid <- foreach(
 ) %dorng% {
   hp_i <- tune_grid[i, ]
   hp_i$leave_out <- NULL
+  hp_i <- as.list(hp_i)
   test_years <- tune_grid[i, ][["leave_out"]][[1]]
 
+  t0 <- Sys.time()
   preds <- one_model(part, hp = hp_i, id_cols = id_cols,
                      target = "any_neg_change_2yr",
                      leave_out_year = test_years)
   hp_i[["preds"]] <- list(preds)
+  hp_i[["time"]]  <- as.numeric(Sys.time() - t0)
   hp_i
 }
 
@@ -175,8 +182,12 @@ list_bin_class_summary <- function(l) {
 tune_grid <- tune_grid %>%
   group_by(nrounds, eta, gamma, max_depth, min_child_weight, max_delta_step,
            subsample, colsample_bytree, lambda, alpha) %>%
-  summarize(preds = list(bind_rows(preds)), .groups = "keep") %>%
-  summarize(cost = list(list_bin_class_summary(preds)), .groups = "drop") %>%
+  summarize(preds = list(bind_rows(preds)),
+            time  = sum(time),
+            .groups = "keep") %>%
+  summarize(cost = list(list_bin_class_summary(preds)),
+            time = unique(time),
+            .groups = "drop") %>%
   tidyr::unnest(cost)
 
 # append new results to existing grid

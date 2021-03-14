@@ -1,5 +1,7 @@
 Tuning results for random forest (model 4)
 ================
+andybega
+2021-03-13
 
 ``` r
 suppressPackageStartupMessages({
@@ -28,7 +30,8 @@ res %>%
 
 ![](tuning-model4_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
-Prior to v11, num.trees and mtry were tuned using a self-tuning model
-(`mlr`’s `TuneWrapper`). Doesn’t make much sense to tune num.trees. A
-value of 1,000 seems to be sufficient. Tune the other three parameters
-instead.
+``` r
+# Prior to v11, num.trees and mtry were tuned using a self-tuning model
+# (`mlr`'s `TuneWrapper`). Doesn't make much sense to tune num.trees. A value
+# of 1,000 seems to be sufficient. Tune the other three parameters instead.
+```

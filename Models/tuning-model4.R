@@ -1,13 +1,11 @@
----
-title: "Tuning results for random forest (model 4)"
-output: github_document
----
+#' ---
+#' title: "Tuning results for random forest (model 4)"
+#' date: "`r format(Sys.Date())`"
+#' output:
+#'   github_document
+#' ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
-```{r}
 suppressPackageStartupMessages({
   library(dplyr)
   library(ggplot2)
@@ -28,6 +26,7 @@ res %>%
   geom_smooth() +
   theme_minimal() +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1))
-```
 
-Prior to v11, num.trees and mtry were tuned using a self-tuning model (`mlr`'s `TuneWrapper`). Doesn't make much sense to tune num.trees. A value of 1,000 seems to be sufficient. Tune the other three parameters instead. 
+# Prior to v11, num.trees and mtry were tuned using a self-tuning model
+# (`mlr`'s `TuneWrapper`). Doesn't make much sense to tune num.trees. A value
+# of 1,000 seems to be sufficient. Tune the other three parameters instead.

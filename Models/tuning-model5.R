@@ -24,7 +24,7 @@ res %>%
   group_by(hp) %>%
   filter(length(unique(hp_val)) > 1) %>%
   ungroup() %>%
-  pivot_longer(Brier:AUC_PR, names_to = "measure", values_to = "m_val") %>%
+  pivot_longer(Brier:time, names_to = "measure", values_to = "m_val") %>%
   ggplot(aes(x = hp_val, y = m_val, group = interaction(hp, measure))) +
   facet_grid(measure ~ hp, scales = "free") +
   geom_point() +
@@ -33,4 +33,20 @@ res %>%
   labs(y = "Accuracy measure value", x = "HP value") +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=1))
 
-
+res %>%
+  filter(nrounds > 25, max_delta_step > .5,
+         eta > .1, eta < .6,
+         min_child_weight > 1) %>%
+  pivot_longer(nrounds:alpha, names_to = "hp", values_to = "hp_val") %>%
+  # filter out HP that are constant, i.e. not being tuned
+  group_by(hp) %>%
+  filter(length(unique(hp_val)) > 1) %>%
+  ungroup() %>%
+  pivot_longer(Brier:time, names_to = "measure", values_to = "m_val") %>%
+  ggplot(aes(x = hp_val, y = m_val, group = interaction(hp, measure))) +
+  facet_grid(measure ~ hp, scales = "free") +
+  geom_point() +
+  geom_smooth() +
+  theme_minimal() +
+  labs(y = "Accuracy measure value", x = "HP value") +
+  theme(panel.border = element_rect(colour = "black", fill=NA, size=1))
