@@ -1,6 +1,8 @@
 #
 #   Model 5: XGboost
 #
+#   AB: for the 2021 update, with fixed HP, this now runs in under 2m
+#
 
 # to ID output files
 model_prefix <- "mdl5"
@@ -21,29 +23,13 @@ source("R/functions.R")
 #   Setup task and learner
 #   ______________________
 
-# Parameter search space
-ps_xgboost <- makeParamSet(
-  # The number of trees in the model (each one built sequentially)
-  makeIntegerParam("nrounds", lower = 100, upper = 500),
-  # number of splits in each tree
-  makeIntegerParam("max_depth", lower = 1, upper = 10),
-  # "shrinkage" - prevents overfitting
-  makeNumericParam("eta", lower = .1, upper = .5),
-  # L2 regularization - prevents overfitting
-  makeNumericParam("lambda", lower = -1, upper = 0, trafo = function(x) 10^x)
-)
 
-# Random forest with hyperparameter optimization via 10-fold CV over random grid
-auto_xgboost <- makeTuneWrapper(
-  learner    = makeLearner("classif.xgboost", predict.type = "prob"),
-  par.set    = ps_xgboost,
-  resampling = makeResampleDesc("CV", iters = TUNE_CV_FOLDS),
-  measures   = list(mlr::brier),
-  control    = makeTuneControlRandom(maxit = RANDOM_TUNE_SAMPLES),
-  show.info  = FALSE)
-
-
-learner <- auto_xgboost
+learner <- makeLearner("classif.xgboost", predict.type = "prob",
+                       nrounds = 50, eta = 0.25, gamma = 0, max_depth = 8,
+                       min_child_weight = 2.5, max_delta_step = 5,
+                       subsample = 0.7, colsample_bytree = 0.65,
+                       lambda = 1, alpha = 0,
+                       nthread = N_CORES)
 task    <- full_task
 
 
