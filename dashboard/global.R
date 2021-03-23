@@ -46,11 +46,11 @@ FCAST_YEARS <- sprintf("%s-%s", yr, yr + 1)
 # Plot top N forecasts ----------------------------------------------------
 
 topNriskFun <- function(dat){
-  N <- nrow(dat)
+  dat$label <- paste(seq(1, nrow(dat), 1), dat$country_name, sep = ": ")
   canvasClickFunction <- JS("function(event) {Shiny.onInputChange('canvasClicked', [this.name, event.point.category]);}")
-  dat%>%
+  dat %>%
     hchart(type = "bar",
-           hcaes(x = paste(seq(1, N, 1), country_name, sep = ": "),
+           hcaes(x = label,
                  y = prob_onset,
                  color = color_prob,
                  pointWidth = 20),
@@ -62,7 +62,7 @@ topNriskFun <- function(dat){
     hc_yAxis(
       min = 0, max = 50,
       title = list(
-        text = paste("Top ", N, sprintf(" Estimated Risks (%%) for %s", FCAST_YEARS), sep = ""),
+        text = paste("Top ", nrow(dat), sprintf(" Estimated Risks (%%) for %s", FCAST_YEARS), sep = ""),
         style = list(fontSize = plotsFontSize, fontWeight = "bold")),
       labels = list(style = list(
         fontSize = plotsFontSize,
