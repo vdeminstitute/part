@@ -1,8 +1,9 @@
 
-packs <- c("tidyverse", "rio", "leaflet", "shiny", "highcharter", "shinyWidgets")
-# install.packages(packs, dependencies = TRUE)
-lapply(packs, library, character.only = TRUE)
 
+library(dplyr)
+library(leaflet)
+library(highcharter)
+library(shinyWidgets)
 library(sf)
 
 GW_shp_file_new <- readRDS("Data/new_map_data.rds")
