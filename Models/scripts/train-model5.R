@@ -22,18 +22,13 @@ source("scripts/0-setup-training-environment.R")
 # import functions
 source("R/functions.R")
 
-#
-#   Setup task and learner
-#   ______________________
-
-
+# Make learner
 learner <- makeLearner("classif.xgboost", predict.type = "prob",
                        nrounds = 50, eta = 0.25, gamma = 0, max_depth = 8,
                        min_child_weight = 2.5, max_delta_step = 5,
                        subsample = 0.7, colsample_bytree = 0.65,
                        lambda = 1, alpha = 0,
                        nthread = N_CORES)
-task    <- full_task
 
 
 #
@@ -42,7 +37,7 @@ task    <- full_task
 
 
 lgr$info("Running test forecasts")
-test_forecasts <- test_forecast(learner, task, TEST_FORECAST_YEARS)
+test_forecasts <- test_forecast(learner, full_task, TEST_FORECAST_YEARS)
 write_rds(test_forecasts, file = sprintf("output/predictions/%s_test_forecasts.rds", model_prefix))
 
 
@@ -53,7 +48,7 @@ write_rds(test_forecasts, file = sprintf("output/predictions/%s_test_forecasts.r
 
 lgr$info("Running live forecast")
 # Estimate final version of model on full data
-mdl_full_data <- mlr::train(learner, task)
+mdl_full_data <- mlr::train(learner, full_task)
 write_rds(mdl_full_data, file = sprintf("output/models/%s_full_data.rds", model_prefix))
 
 forecast_data <- split_data$fcast %>% select(-!!TARGET)
@@ -71,13 +66,5 @@ write_rds(fcast, sprintf("output/predictions/%s_live_forecast.rds", model_prefix
 #   ________
 
 parallelStop()
-
-#
-#   Process results / creates figures, performance tables, etc.
-#   ____________________________________
-#
-#   The behavior of the assess-model.R script depends on having the correct
-#   model_prefix variable set at the beginning of this script.
-#
 
 lgr$info("Models done, please source assessment script")

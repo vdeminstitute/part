@@ -5,11 +5,14 @@
 # UPDATE: mark the summary table with version number
 VERSION <- "v11"
 
-library("readr")
-library("purrr")
-library("readr")
-library("tidyr")
-library("dplyr")
+suppressPackageStartupMessages({
+  library(readr)
+  library(purrr)
+  library(readr)
+  library(tidyr)
+  library(dplyr)
+})
+
 
 all_perf <- dir("output/performance",
                 pattern = "mdl[0-9]+[a-z-]+performance.csv",

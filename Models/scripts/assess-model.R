@@ -2,31 +2,30 @@
 #   Assess model results
 #   2019-02-20
 #
+#   NOTE: This script will loop over _all_ models and rebuild the plots and fit
+#   metrics. If you want to do it only for one model, see line 27 below.
 
 # UPDATE: what version of V-Dem is this set of forecasts using?
 VERSION = "v11"
 
-library(tidyverse)
-library(readr)
-library(mlr)
-library(glmnet)
-library(here)
-library(pROC)
-library(states)
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(readr)
+  library(mlr)
+  library(glmnet)
+  library(here)
+  library(pROC)
+  library(states)
+})
 
 setwd(here("Models"))
 
 source("R/functions.R")
 
-#   This relies on model_prefix to find relevant files
-#   This is already set in the train models scripts, but if running this
-#   script by itself, set it.
-#model_prefix <- "mdl3"
-
 # Loop over all models and update all assessments
 prefixes <- paste0("mdl", 1:6)
 # If you want to run this for only one model, alter prefixes; e.g.:
-prefixes <- "mdl4"
+#prefixes <- "mdl6"
 
 for (model_prefix in prefixes) {
 

@@ -62,12 +62,4 @@ write_rds(fcast, sprintf("output/predictions/%s_live_forecast.rds", model_prefix
 
 parallelStop()
 
-#
-#   Process results / creates figures, performance tables, etc.
-#   ____________________________________
-#
-#   The behavior of the assess-model.R script depends on having the correct
-#   model_prefix variable set at the beginning of this script.
-#
-
-source("scripts/assess-model.R")
+lgr$info("Models done, please source assessment script")
