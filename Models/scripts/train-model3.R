@@ -1,7 +1,7 @@
 #
 #   Model 3: Regularized logistic regresion (glmnet::glmnet(.., family = "binomial"))
 #
-#   AB: running this for the 2021 update took about 1hr with 7 cores
+#   AB: running this for the 2021 update took about 12m with 7 cores
 #
 
 # to ID output files

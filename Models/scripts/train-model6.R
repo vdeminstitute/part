@@ -86,4 +86,4 @@ parallelStop()
 #   model_prefix variable set at the beginning of this script.
 #
 
-source("scripts/assess-model.R")
+lgr$info("Models done, please source assessment script")
