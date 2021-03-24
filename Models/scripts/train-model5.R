@@ -7,6 +7,9 @@
 # to ID output files
 model_prefix <- "mdl5"
 
+# The forecasts will vary a bit if we don't fix the RNG seed
+set.seed(1234)
+
 # install.packages("xgboost", dependencies = TRUE)
 
 library(here)
@@ -77,5 +80,4 @@ parallelStop()
 #   model_prefix variable set at the beginning of this script.
 #
 
-lgr$info("Models done, sourcing assessment script")
-source("scripts/assess-model.R")
+lgr$info("Models done, please source assessment script")
