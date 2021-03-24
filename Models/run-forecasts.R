@@ -12,13 +12,9 @@
 #   that end up in the dashboard.
 #
 #   Each model script can be run by itself. In fact this is how I run them.
-#   They can take several hours each to run, and are setup to run in parallel.
-#   In any case, this file shows how to run them in order, as well as the
-#   final script that summarizes the overall performance/accuracy.
-#
-#   NOTE: When running as a RStudio job, the model assessment run at the end of
-#   each script does not work correctly. Go into `assess-model.R`, uncomment
-#   and adjust `model_prefix <- ...` as needed, and manually run the script.
+#   Note that each is setup to run in parallel. In any case, this file shows
+#   how to run them in order, as well as the final scripts that summarize the
+#   each models forecasts and overall performance/accuracy.
 #
 
 # Logistic regression
@@ -39,5 +35,15 @@ source("scripts/train-model5.R", echo = TRUE)
 # Ensemble of glmnet, rf, xgboost
 source("scripts/train-model6.R", echo = TRUE)
 
+# Update forecast plots/performance summary for each model
+source("scripts/assess-model.R", echo = TRUE)
+
 # Keep a summary of overall performance/accuracy
 source("scripts/summarize-performance.R", echo = TRUE)
+
+# UPDATE:
+# the final forecasts are in mdl6_live_forecasts.rds and mdl6_test_forecasts.rds
+# copy those over to dashboard/data-raw and then in that folder
+# data-organization.R will need to be run in order to update the transformed
+# data objects the dashboard actually uses.
+

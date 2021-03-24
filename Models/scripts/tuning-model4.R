@@ -43,9 +43,14 @@ part <- part[part$year < 2011, ]
 
 tune_grid <- tibble(
   row = 1:TUNE_N,
+  # for mlr/ranger default settings: getParamSet("classif.ranger")
+  # default is 500
   num.trees       = as.integer(runif(TUNE_N, min = 5, max = 30.99))*100,
+  # default is floor(sqrt(ncol(X))) = 21; [1, 2, ..., Inf]
   mtry            = as.integer(runif(TUNE_N, min = 5, max = 140)),
+  # default is 10 for probability; [1, 2, ..., Inf]
   min.node.size   = as.integer(runif(TUNE_N, min = 1, max = 20)),
+  # default is 1; 0 - 1
   sample.fraction = runif(TUNE_N, min = 0.5, max = 1),
   cost = list(NULL)
 )
