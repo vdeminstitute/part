@@ -46,4 +46,8 @@ source("scripts/summarize-performance.R", echo = TRUE)
 # copy those over to dashboard/data-raw and then in that folder
 # data-organization.R will need to be run in order to update the transformed
 # data objects the dashboard actually uses.
+#
+# The train-model6.R script, which does the ensemble, will also already have
+# written a more human-readable copy of the forecasts to archive/
+#
 

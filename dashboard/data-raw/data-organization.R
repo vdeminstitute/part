@@ -22,10 +22,18 @@ library(rgeos)  # for gCentroid
 
 setwd(here("dashboard"))
 
+# UPDATE: manually run this to update the ensemble forecast inputs:
+if (FALSE) {
+  file.copy(here::here("Models/output/predictions/mdl6_test_forecasts.rds"),
+            here::here("dashboard/data-raw"), overwrite = TRUE)
+  file.copy(here::here("Models/output/predictions/mdl6_live_forecast.rds"),
+            here::here("dashboard/data-raw"), overwrite = TRUE)
+}
+
 # V-Dem data for indices
 vdem_complete <- readRDS("data-raw/V-Dem-CY-Full+Others-v11.rds")
 
-MAX_DATA <- max(vdem_select$year)
+MAX_DATA <- max(vdem_complete$year)
 MIN_DATA <- MAX_DATA - 9  # go back 9 years, for 10 years total, for time series plot
 
 # PART data
@@ -139,7 +147,9 @@ saveRDS(map_data, file = "data/new_map_data.rds", compress = FALSE)
 #
 
 N <- 20
-bar_plot_dat <- GW_shp_file@data %>%
+bar_plot_dat <- map_data %>%
+  st_set_geometry(NULL) %>%
+  as_tibble() %>%
   arrange(desc(prob_onset)) %>%
   select(country_name, prob_onset, color_prob) %>%
   mutate(
