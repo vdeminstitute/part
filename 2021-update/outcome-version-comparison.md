@@ -1,24 +1,75 @@
 Comparing v9 and v11 RoW changes
 ================
+Andreas Beger
+2021-03-25
 
-Andreas Beger  
-2021-03-10
+``` r
+suppressPackageStartupMessages({
+  library(states)
+  library(dplyr)
+  library(readr)
+  library(here)
+})
+
+keep <- c("gwcode", "country_id", "year", "country_name", "any_neg_change",
+          "any_neg_change_2yr", "v2x_regime", "lagged_v2x_regime")
+
+v9 <- read_csv(here("archive/part-v9.csv"), col_types = cols())[, keep]
+v11 <- read_csv(here("archive/part-v11.csv"), col_types = cols())[, keep]
+
+# v9 doesn't have the right name for North Macedonia. That will cause merge
+# problems.
+v9$country_name[v9$country_name=="Macedonia"] <- "North Macedonia"
+
+vdem11 <- readRDS(here("create-data/input/V-Dem-CY-Full+Others-v11.rds"))[, c("country_id", "year", "v2x_regime")]
+vdem11 <- vdem11[vdem11$year >= min(v9$year), ]
+
+# I want a dataset that has all cases which are positive in either version
+# Start by adding an indicator for RoW changes
+v9pos <- v9 %>%
+  filter(year < 2019) %>%
+  mutate(v9pos = any_neg_change,
+         v9change = paste0(lagged_v2x_regime, "->", v2x_regime)) %>%
+  select(gwcode, country_id, year, country_name, v9pos, v9change)
+v11pos <- v11 %>%
+  filter(
+         # drop years that are not in v9
+         year %in% unique(v9pos$year)) %>%
+  mutate(v11pos = any_neg_change,
+         v11change = paste0(lagged_v2x_regime, "->", v2x_regime)) %>%
+  select(gwcode, country_id, year, country_name, v11pos, v11change)
+
+both <- full_join(v9pos, v11pos) %>%
+  filter(v9pos==1 | v11pos==1) %>%
+  mutate(category = case_when(
+    v9pos==1 & v11pos==1 ~ "in both",
+    v9pos==1 & v11pos!=1 ~ "only v9",
+    v9pos!=1 & v11pos==1 ~ "only v11",
+    TRUE ~ "missing"
+  ))
+```
+
+    ## Joining, by = c("gwcode", "country_id", "year", "country_name")
 
 There are substantial differences in the sets of identified negative
 Regimes of the World (RoW) indicator changes between the v9 and v11
 version of the V-Dem data.
 
 The v9 and v11 versions of the RoW change data range jointly from 1970
-to 2019. The v9 version has 189 negative RoW changes in that period; v11
-has 159. Furthermore, the sets of cases identified are quite different:
+to 2019. The v9 version has 188 negative RoW changes in that period; v11
+has 154. Furthermore, the sets of cases identified are quite different:
+
+``` r
+table(v9 = both$v9pos, v11 = both$v11pos)
+```
 
     ##    v11
     ## v9    0   1
     ##   0   0  33
     ##   1  67 121
 
-Only 122 cases are identified in both. The v9 data has 66 changes that
-are not in v11 and vice versa there are 30 in v11 that are not in v9.
+Only 121 cases are identified in both. The v9 data has 67 changes that
+are not in v11 and vice versa there are 33 in v11 that are not in v9.
 
 That’s a challenge for assessing the accuracy of forecasts. In essence,
 if we develop forecasts using the v9 V-Dem data, and then score it with
@@ -35,6 +86,12 @@ in some cases cross a relevant threshold, thus changing the RoW
 category.
 
 Below is a table of positive cases in either dataset.
+
+``` r
+both %>%
+  arrange(country_name, year) %>%
+  knitr::kable()
+```
 
 | gwcode | country\_id | year | country\_name            | v9pos | v9change | v11pos | v11change | category |
 | -----: | ----------: | ---: | :----------------------- | ----: | :------- | -----: | :-------- | :------- |
