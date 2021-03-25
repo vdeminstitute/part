@@ -33,6 +33,7 @@ library(readr)
 library(stringr)
 library(forcats)
 library(yaml)
+library(here)
 
 naCountFun <- function(dat, exclude_year){
   dat%>%
@@ -43,7 +44,7 @@ naCountFun <- function(dat, exclude_year){
 
 # We need a balanced data frame and we need to remove "problem" countries --
 # countries that have a lot of missingness in the VDem data...
-Vdem_raw <- read_rds(here(VDEM_DATA))
+Vdem_raw <- read_rds(here::here(VDEM_DATA))
 Vdem_complete <- Vdem_raw %>%
   filter(year >= 1900) %>%
   group_by(country_id) %>%
@@ -358,6 +359,14 @@ write_yaml(sig, here(sprintf("create-data/output/regime-shift-%s-signature.yml",
                         VERSION)))
 write_yaml(sig, here("create-data/output/regime-shift-signature.yml"))
 
+# Record ART cases so changes are easier to ID
+art_cases <- VDem_GW_regime_shift_data %>%
+  filter(any_neg_change==1) %>%
+  select(year, country_name) %>%
+  arrange(year, country_name)
+write_csv(art_cases, here::here("create-data/output/art-cases.csv"))
+
+# Ok, now write the actually important output
 write_csv(VDem_GW_regime_shift_data, here("create-data/output/regime-shift-data-1970on.csv"))
 
 
