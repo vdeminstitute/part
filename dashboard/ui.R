@@ -125,19 +125,25 @@ bootstrapPage(
             h4(
               tags$span(
                 style = "font-size: 90%; color: black;",
-                "Further, given that this is the first year of this project, we do not yet know how accurately this project can forecast future transitions in the real world as opposed to statistical simulations and out-of-sample tests. However, we are posting these forecasts in the interest of transparency."
-              )
-            ),
-            h4(
-              tags$span(
-                style = "font-size: 90%; color: black;",
                 tags$b("Yearly Risk Estimates"), " - We derive risk estimates starting from 2011 using a simulation framework that mimics the process we use to produce the current forecasts. In short, we first train our models using all data from 1970 to 2009. We then use data from 2010 to produce estimated risk forecasts for 2011-12. We then retrain our models using all data from 1970 to 2010, use data from 2011 to produce estimates for 2012-12. We conduct this iterative model check procedure for all years from 2011 onwards for which we have already observed the 2-year outcome.")
             ),
             h4(
               tags$span(
                 style = "font-size: 90%; color: black;",
-                # UDATE: V-Dem data version
-                tags$b("Data"), "- To produce our estimated risk forecasts, we use", a(href= "https://www.v-dem.net/en/data/data-version-9/", "V-Dem data version 11", target="_blank"), "along with" , a(href= "https://unstats.un.org/unsd/snaama/Index", "UN GDP and population data,", target="_blank"), a(href= "https://icr.ethz.ch/publications/integrating-data-on-ethnicity-geography-and-conflict/", "ethnic power relations data (Vogt et al. 2015),", target="_blank"), a(href= "https://www.jonathanmpowell.com/coup-detat-dataset.html", "coup event data (Powell and Thyne 2011),", target="_blank"), "and", a(href= "https://ucdp.uu.se/downloads/", "UCDP armed conflict data (Pettersson and Eck 2018),", target="_blank"), "over 400 variables altogether. We lag all variables one year and derive the first differences for a number of variables. All of variables we use in our models are lagged one year. Thus, data for 2016 is used to estimate the risk of ARTs for 2017/18.")),
+                # UDATE: V-Dem data version and URL
+                tags$b("Data"), "- To produce our estimated risk forecasts, we use",
+                a(href= "https://www.v-dem.net/en/data/data/v-dem-dataset-v11/", "V-Dem data version 11", target="_blank"),
+                "along with" ,
+                a(href= "https://unstats.un.org/unsd/snaama/Index", "UN GDP and population data,", target="_blank"),
+                a(href= "https://icr.ethz.ch/publications/integrating-data-on-ethnicity-geography-and-conflict/", "ethnic power relations data (Vogt et al. 2015),", target="_blank"),
+                a(href= "https://www.jonathanmpowell.com/coup-detat-dataset.html", "coup event data (Powell and Thyne 2011),", target="_blank"),
+                "and",
+                a(href= "https://ucdp.uu.se/downloads/", "UCDP armed conflict data (Pettersson and Eck 2018),", target="_blank"),
+                "over 400 variables altogether.",
+                paste0("We lag all variables one year. Thus, data for 2016 is ",
+                       "used to estimate the risk of ARTs for 2017/18.")
+              )
+            ),
             h4(
               tags$span(
                 style = "font-size: 90%; color: black;",
@@ -146,17 +152,18 @@ bootstrapPage(
             h4(
               tags$span(
                 style = "font-size: 90%; color: black;",
-                tags$b("Effective positive rate"), "- The yearly rate of adverse regime transitions of our dependent variable in any given year ranges from around 1.4 percent to 10 percent; 75 percent of our yearly positive rates are between 3.8 percent and 5.6 percent.")
+                tags$b("Effective positive rate"), "- The yearly rate of adverse regime transitions of our dependent variable in any given year ranges from around 1.4 percent to 10 percent.")
             ),
             h4(
               tags$span(
                 style = "font-size: 90%; color: black;",
-                tags$b("Models"),"- We use three machine learning models: logit with elastic-net regularization, random forest, and gradient boosted forest. To help account for differences across these models, we use an unweighted model average ensemble. This is our preferred approach, as it helps smooth out our predicted risk estimates while improving accuracy. The estimates shown above are from this ensemble model.")
+                tags$b("Models"), "- We use three machine learning models: logit with elastic-net regularization, random forest, and gradient boosted forest. To help account for differences across these models, we use an unweighted model average ensemble. This is our preferred approach, as it helps smooth out our predicted risk estimates while improving accuracy. The estimates shown above are from this ensemble model.")
             ),
             h4(
               tags$span(
                 style = "font-size: 90%; color: black;",
-                tags$b("Model Assessment"),"- Our unweighted model average ensemble model reports an AUC-PR score of 0.46 in a 2x7 repeated cross-validation procedure (1970-2017) and an AUC-PR score of 0.39 in our set of yearly test forecasts (2011-2017). As a general benchmark of performance, an AUC-PR score that is higher than the observed frequency of events in the data is a signal that the model is an improvement over chance. With an observed frequency of ARTs at roughly 4 percent, our unweighted model average ensemble exceeds performance expectations.")
+                # UPDATE: performance stats from Models/output/tables/test-perf.md
+                tags$b("Model Assessment"),"- The ensemble model has AUC-PR and AUC-ROC scores of 0.45 and 0.85 in test forecasts from 2010 - 2019. As a general benchmark of performance, a naive forecast using the baserate of ARTs in our data--about 4%--will on average have AUC-PR and AUC-ROC scores of 0.04 and 0.50.")
             )
           )
         )
