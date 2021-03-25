@@ -14,8 +14,8 @@ has 159. Furthermore, the sets of cases identified are quite different:
 
     ##    v11
     ## v9    0   1
-    ##   0   0  30
-    ##   1  66 122
+    ##   0   0  33
+    ##   1  67 121
 
 Only 122 cases are identified in both. The v9 data has 66 changes that
 are not in v11 and vice versa there are 30 in v11 that are not in v9.
@@ -44,7 +44,8 @@ Below is a table of positive cases in either dataset.
 |    160 |          37 | 1976 | Argentina                |     1 | 2-\>1    |      1 | 2-\>1     | in both  |
 |    160 |          37 | 1977 | Argentina                |     1 | 1-\>0    |      1 | 1-\>0     | in both  |
 |    371 |         105 | 1995 | Armenia                  |     1 | 2-\>1    |      1 | 2-\>1     | in both  |
-|    771 |          24 | 1975 | Bangladesh               |     1 | 1-\>0    |      1 | 1-\>0     | in both  |
+|    771 |          24 | 1975 | Bangladesh               |     1 | 1-\>0    |      0 | 1-\>1     | only v9  |
+|    771 |          24 | 1976 | Bangladesh               |     0 | 0-\>0    |      1 | 1-\>0     | only v11 |
 |    771 |          24 | 1983 | Bangladesh               |     1 | 1-\>0    |      1 | 1-\>0     | in both  |
 |    771 |          24 | 2002 | Bangladesh               |     0 | 2-\>2    |      1 | 2-\>1     | only v11 |
 |    771 |          24 | 2006 | Bangladesh               |     1 | 2-\>1    |      0 | 1-\>1     | only v9  |
@@ -224,7 +225,8 @@ Below is a table of positive cases in either dataset.
 |    800 |          49 | 1977 | Thailand                 |     1 | 1-\>0    |      1 | 1-\>0     | in both  |
 |    800 |          49 | 1991 | Thailand                 |     1 | 1-\>0    |      1 | 1-\>0     | in both  |
 |    800 |          49 | 2000 | Thailand                 |     1 | 2-\>1    |      0 | 2-\>2     | only v9  |
-|    800 |          49 | 2006 | Thailand                 |     1 | 2-\>0    |      1 | 2-\>0     | in both  |
+|    800 |          49 | 2006 | Thailand                 |     1 | 2-\>0    |      1 | 2-\>1     | in both  |
+|    800 |          49 | 2007 | Thailand                 |     0 | 0-\>0    |      1 | 1-\>0     | only v11 |
 |    800 |          49 | 2013 | Thailand                 |     1 | 2-\>1    |      1 | 2-\>1     | in both  |
 |    800 |          49 | 2014 | Thailand                 |     1 | 1-\>0    |      1 | 1-\>0     | in both  |
 |    420 |         117 | 1972 | The Gambia               |     0 | 2-\>2    |      1 | 2-\>1     | only v11 |
@@ -236,7 +238,8 @@ Below is a table of positive cases in either dataset.
 |    616 |          98 | 1974 | Tunisia                  |     1 | 1-\>0    |      0 | 1-\>1     | only v9  |
 |    616 |          98 | 1987 | Tunisia                  |     0 | 0-\>0    |      1 | 1-\>0     | only v11 |
 |    616 |          98 | 2018 | Tunisia                  |     1 | 3-\>2    |      0 | 2-\>2     | only v9  |
-|    640 |          99 | 1980 | Turkey                   |     1 | 2-\>0    |      1 | 2-\>0     | in both  |
+|    640 |          99 | 1980 | Turkey                   |     1 | 2-\>0    |      1 | 2-\>1     | in both  |
+|    640 |          99 | 1981 | Turkey                   |     0 | 0-\>0    |      1 | 1-\>0     | only v11 |
 |    640 |          99 | 2013 | Turkey                   |     1 | 2-\>1    |      1 | 2-\>1     | in both  |
 |    701 |         136 | 2012 | Turkmenistan             |     1 | 1-\>0    |      0 | 1-\>1     | only v9  |
 |    500 |          50 | 1985 | Uganda                   |     1 | 1-\>0    |      1 | 1-\>0     | in both  |

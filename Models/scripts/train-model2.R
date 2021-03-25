@@ -2,7 +2,8 @@
 #   Model 2: restricted logistic regression
 #
 
-warning("add remaining features")
+library(here)
+library(lgr)
 
 setwd(here::here("Models"))
 

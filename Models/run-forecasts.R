@@ -17,6 +17,8 @@
 #   each models forecasts and overall performance/accuracy.
 #
 
+setwd(here::here("Models"))
+
 # Logistic regression
 source("scripts/train-model1.R", echo = TRUE)
 

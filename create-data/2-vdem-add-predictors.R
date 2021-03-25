@@ -19,7 +19,7 @@ VERSION <- "v11"
 # keep this the same
 START_YEAR  <- 1968
 # The V-Dem data we use as input; should be correct automatically with VERSION
-VDEM_DATA <- sprintf(here("create-data/input/V-Dem-CY-Full+Others-%s.rds"), VERSION)
+VDEM_DATA <- sprintf(here::here("create-data/input/V-Dem-CY-Full+Others-%s.rds"), VERSION)
 
 
 library(dplyr)
@@ -36,7 +36,7 @@ naCountFun <- function(dat, exclude_year){
     sort()
 }
 
-setwd(here("create-data"))
+setwd(here::here("create-data"))
 
 
 ## This is the target variable dataset. We'll need it at the end...

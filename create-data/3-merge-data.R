@@ -307,5 +307,10 @@ write_yaml(sig, "output/part-signature.yml")
 
 write_csv(part, sprintf("output/part-%s.csv", VERSION))
 
+# Propagate downstream
+write_csv(part, sprintf("../archive/part-%s.csv", VERSION))
+write_csv(part, sprintf("../dashboard/data-raw/part-%s.csv", VERSION))
+write_csv(part, sprintf("../Models/input/part-%s.csv", VERSION))
+
 
 

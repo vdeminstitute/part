@@ -16,11 +16,11 @@ year,country_name
 1974,Afghanistan
 1974,Chile
 1974,Rwanda
-1975,Bangladesh
 1975,India
 1975,Laos
 1975,Mauritania
 1976,Argentina
+1976,Bangladesh
 1976,Cape Verde
 1977,Argentina
 1977,Jamaica
@@ -39,6 +39,7 @@ year,country_name
 1981,Burkina Faso
 1981,Ghana
 1981,Philippines
+1981,Turkey
 1982,Djibouti
 1982,Sri Lanka
 1983,Bangladesh
@@ -105,6 +106,7 @@ year,country_name
 2007,Bangladesh
 2007,Fiji
 2007,Nicaragua
+2007,Thailand
 2008,Mauritania
 2009,Guinea
 2009,Honduras

@@ -6,8 +6,8 @@ N_columns: 465
 N_rows: 8190
 N_complete_rows: 7856
 Countries: 174
-Sum_any_neg_change: 164
-Sum_any_neg_change_2yr: 318
+Sum_any_neg_change: 166
+Sum_any_neg_change_2yr: 320
 Columns:
 - gwcode
 - year

@@ -6,14 +6,14 @@ Andreas Beger
 Several countries in Europe as well as Canada have high values for the
 risk of an adverse regime transition (ART) in 2021-2022. In Europe these
 including “surprising” countries like Norway and Denmark, which rank at
-11 and 15, respectively.
+18 and 10, respectively.
 
 Are these indicative for mistakes or shortcomings in the PART forecast
 model, or do they appear to be legitimately high risk cases?
 
 (And one should note that although ranking high in terms of relative
 risk, the actual estimated probabilities of an ART are still relatively
-low, 16 - 11% for the 5 cases I will look at in more detail below)
+low, 22 - 11% for the 5 cases I will look at in more detail below)
 
 ``` r
 suppressPackageStartupMessages({
@@ -43,18 +43,19 @@ Looking at the forecasts, there are several European countries that rank
 relatively highly in the forecasts for 2021-2022. Does this make sense?
 
 ``` r
-fcast$rank[fcast$country_name %in% c("Norway", "Denmark", "Italy", "Slovenia",
-                                     "Canada")]
+fcast[fcast$country_name %in% c("Norway", "Denmark", "Italy", "Slovenia",
+                                "Canada", "Latvia", "Albania"),
+      c("country_name", "prob", "rank")]
 ```
 
-    ## [1] 11 15 17 19 22
-
-``` r
-fcast$prob[fcast$country_name %in% c("Norway", "Denmark", "Italy", "Slovenia",
-                                     "Canada")]
-```
-
-    ## [1] 0.1608002 0.1474036 0.1242046 0.1210460 0.1133446
+    ##    country_name      prob rank
+    ## 1       Albania 0.3547004    1
+    ## 6      Slovenia 0.2176059    6
+    ## 7        Latvia 0.2142608    7
+    ## 10      Denmark 0.1680304   10
+    ## 17        Italy 0.1256787   17
+    ## 18       Norway 0.1212483   18
+    ## 23       Canada 0.1078568   23
 
 ## Were there similar cases with actual ARTs in 2020?
 
