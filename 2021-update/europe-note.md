@@ -1,19 +1,19 @@
 Europe note
 ================
 Andreas Beger
-2021-03-24
+2021-03-25
 
-Several countries in Europe have high values for the risk of an adverse
-regime transition (ART) in 2021-2022. These including “surprising”
-countries like Norway and Denmark, which rank at 11 and 15,
-respectively.
+Several countries in Europe as well as Canada have high values for the
+risk of an adverse regime transition (ART) in 2021-2022. In Europe these
+including “surprising” countries like Norway and Denmark, which rank at
+11 and 15, respectively.
 
 Are these indicative for mistakes or shortcomings in the PART forecast
 model, or do they appear to be legitimately high risk cases?
 
 (And one should note that although ranking high in terms of relative
 risk, the actual estimated probabilities of an ART are still relatively
-low, 16 - 12% for the 4 cases I will look at in more detail below)
+low, 16 - 11% for the 5 cases I will look at in more detail below)
 
 ``` r
 suppressPackageStartupMessages({
@@ -43,16 +43,18 @@ Looking at the forecasts, there are several European countries that rank
 relatively highly in the forecasts for 2021-2022. Does this make sense?
 
 ``` r
-fcast$rank[fcast$country_name %in% c("Norway", "Denmark", "Italy", "Slovenia")]
+fcast$rank[fcast$country_name %in% c("Norway", "Denmark", "Italy", "Slovenia",
+                                     "Canada")]
 ```
 
-    ## [1] 11 15 17 19
+    ## [1] 11 15 17 19 22
 
 ``` r
-fcast$prob[fcast$country_name %in% c("Norway", "Denmark", "Italy", "Slovenia")]
+fcast$prob[fcast$country_name %in% c("Norway", "Denmark", "Italy", "Slovenia",
+                                     "Canada")]
 ```
 
-    ## [1] 0.1608002 0.1474036 0.1242046 0.1210460
+    ## [1] 0.1608002 0.1474036 0.1242046 0.1210460 0.1133446
 
 ## Were there similar cases with actual ARTs in 2020?
 
@@ -166,6 +168,8 @@ Denmark & co so I won’t dig in.
 
 Let’s turn back to the cases that I wanted to check.
 
+### Norway
+
 ``` r
 libdem_diagnostic("Norway")
 ```
@@ -213,11 +217,13 @@ var_info("v2clacjstm")[c("name", "question")]
     ## $question
     ## [1] "Do men enjoy secure and effective access to justice?"
 
+### Denmark
+
 ``` r
 libdem_diagnostic("Denmark")
 ```
 
-![](europe-note_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](europe-note_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 vdem %>% filter(country_name=="Denmark") %>% tail(6)
@@ -240,11 +246,13 @@ vdem %>% filter(country_name=="Denmark") %>% tail(6)
 
 Denmark’s transparent laws index went from 3.9 to 3.2 in 2020.
 
+### Italy
+
 ``` r
 libdem_diagnostic("Italy")
 ```
 
-![](europe-note_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](europe-note_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 vdem %>% filter(country_name=="Italy") %>% tail(6)
@@ -266,8 +274,43 @@ vdem %>% filter(country_name=="Italy") %>% tail(6)
     ## 30          3.733         0.861             NA             NA
 
 Italy has been low for a while on the transparent law index, with a
-value of 3.1. Slovenia already went to electoral dem in 2020. Now the
-risk is about further going to electoral autocracy.
+value of 3.1.
+
+### Canada
+
+``` r
+libdem_diagnostic("Canada")
+```
+
+![](europe-note_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
+``` r
+vdem %>% filter(country_name=="Canada") %>% tail(6)
+```
+
+    ##    country_name year v2x_regime v2x_liberal v2cltrnslw_osp v2clacjstm_osp
+    ## 25       Canada 2015          3       0.918          3.758          3.689
+    ## 26       Canada 2016          3       0.919          3.787          3.689
+    ## 27       Canada 2017          3       0.919          3.787          3.689
+    ## 28       Canada 2018          3       0.910          3.650          3.689
+    ## 29       Canada 2019          3       0.895          3.567          3.621
+    ## 30       Canada 2020          3       0.835          3.567          3.621
+    ##    v2clacjstw_osp v2x_polyarchy v2elfrfair_osp v2elmulpar_osp
+    ## 25          3.646         0.819          3.784          3.942
+    ## 26          3.646         0.846             NA             NA
+    ## 27          3.646         0.846             NA             NA
+    ## 28          3.646         0.849             NA             NA
+    ## 29          3.338         0.853          3.885          3.930
+    ## 30          3.069         0.869             NA             NA
+
+Recent decreases in both the liberal democracy index and access to
+justice for women indices; either of those could put Canada over the
+threshold for dropping to electoral democracy.
+
+### Slovenia
+
+Slovenia already went to electoral dem in 2020. Now the risk is about
+further going to electoral autocracy.
 
 For 2020, Hungary, Montenegro, and Serbia are coded as electoral
 democracies, so in a basic sense this doesn’t seem outside of the realm

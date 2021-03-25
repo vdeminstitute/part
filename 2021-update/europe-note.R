@@ -6,16 +6,17 @@
 #'   github_document: default
 #' ---
 
-#' Several countries in Europe have high values for the risk of an adverse
-#' regime transition (ART) in 2021-2022. These including "surprising" countries
-#' like Norway and Denmark, which rank at 11 and 15, respectively.
+#' Several countries in Europe as well as Canada have high values for the risk
+#' of an adverse regime transition (ART) in 2021-2022. In Europe these including
+#' "surprising" countries like Norway and Denmark, which rank at 11 and 15,
+#' respectively.
 #'
 #' Are these indicative for mistakes or shortcomings in the PART forecast model,
 #' or do they appear to be legitimately high risk cases?
 #'
 #' (And one should note that although ranking high in terms of relative risk,
 #' the actual estimated probabilities of an ART are still relatively low,
-#' 16 - 12% for the 4 cases I will look at in more detail below)
+#' 16 - 11% for the 5 cases I will look at in more detail below)
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -42,8 +43,10 @@ vdem <- vdem[vdem$year > 1990, keep]
 #' Looking at the forecasts, there are several European countries that rank
 #' relatively highly in the forecasts for 2021-2022. Does this make sense?
 
-fcast$rank[fcast$country_name %in% c("Norway", "Denmark", "Italy", "Slovenia")]
-fcast$prob[fcast$country_name %in% c("Norway", "Denmark", "Italy", "Slovenia")]
+fcast$rank[fcast$country_name %in% c("Norway", "Denmark", "Italy", "Slovenia",
+                                     "Canada")]
+fcast$prob[fcast$country_name %in% c("Norway", "Denmark", "Italy", "Slovenia",
+                                     "Canada")]
 
 #' ## Were there similar cases with actual ARTs in 2020?
 #'
@@ -124,6 +127,8 @@ var_info("v2cltrnslw")[c("name", "question")]
 #'
 #' Let's turn back to the cases that I wanted to check.
 #'
+#' ### Norway
+#'
 
 libdem_diagnostic("Norway")
 vdem %>% filter(country_name=="Norway") %>% tail(6)
@@ -133,17 +138,39 @@ vdem %>% filter(country_name=="Norway") %>% tail(6)
 var_info("v2clacjstw")[c("name", "question")]
 var_info("v2clacjstm")[c("name", "question")]
 
+#'
+#' ### Denmark
+#'
+
 libdem_diagnostic("Denmark")
 vdem %>% filter(country_name=="Denmark") %>% tail(6)
 
 #' Denmark's transparent laws index went from 3.9 to 3.2 in 2020.
 
+#'
+#' ### Italy
+#'
 libdem_diagnostic("Italy")
 vdem %>% filter(country_name=="Italy") %>% tail(6)
 
 #' Italy has been low for a while on the transparent law index, with a value of
 #' 3.1.
+#'
 
+#'
+#' ### Canada
+#'
+libdem_diagnostic("Canada")
+vdem %>% filter(country_name=="Canada") %>% tail(6)
+
+#' Recent decreases in both the liberal democracy index and access to justice
+#' for women indices; either of those could put Canada over the threshold for
+#' dropping to electoral democracy.
+#'
+
+#'
+#' ### Slovenia
+#'
 #' Slovenia already went to electoral dem in 2020. Now the risk is about further
 #' going to electoral autocracy.
 #'
