@@ -6,7 +6,7 @@ library(highcharter)
 library(shinyWidgets)
 library(sf)
 
-GW_shp_file_new <- readRDS("Data/new_map_data.rds")
+GW_shp_file_new <- readRDS("data/new_map_data.rds")
 
 GW_shp_file_data <- data.frame(GW_shp_file_new) %>%
   select(gwcode, country_name, regime, year,
@@ -14,11 +14,11 @@ GW_shp_file_data <- data.frame(GW_shp_file_new) %>%
   na.omit(.)
 
 
-bar_plot_dat <- readRDS("Data/bar_plot_dat.rds")
+bar_plot_dat <- readRDS("data/bar_plot_dat.rds")
 
-prob1_dat <- readRDS("Data/prob1_dat.rds")
+prob1_dat <- readRDS("data/prob1_dat.rds")
 
-country_characteristic_dat <- readRDS("Data/country_characteristic_dat.rds")
+country_characteristic_dat <- readRDS("data/country_characteristic_dat.rds")
 countryNamesText <- c("", sort(unique(country_characteristic_dat$country_name)))
 
 extended_row_dat <- country_characteristic_dat%>%
