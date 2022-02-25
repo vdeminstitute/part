@@ -50,7 +50,7 @@ function(input, output, session) {
       setView(lng = center_lon, lat = center_lat, zoom = input$map1_zoom)
     if(country_name != ""){
       output$dataTable <- renderTable({extended_row_dat[extended_row_dat$country_name == country_name, c("year", "Extended RoW Classification")]}, width = "auto")
-      output$ROWclass <- renderText({paste("Current Extended RoW Classification: ", extended_row_dat[extended_row_dat$country_name == country_name & extended_row_dat$year == 2018, c("Extended RoW Classification")], sep ="")})
+      output$ROWclass <- renderText({paste("Current Extended RoW Classification: ", extended_row_dat[extended_row_dat$country_name == country_name, c("Extended RoW Classification")] |> tail(1), sep ="")})
       dat1 <- prob1_dat[prob1_dat$country_name == country_name, ]
       output$riskPlot <-  renderHighchart({riskPlotFun(dat1)})
     }

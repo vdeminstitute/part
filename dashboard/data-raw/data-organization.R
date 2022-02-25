@@ -31,13 +31,14 @@ if (FALSE) {
 }
 
 # V-Dem data for indices
-vdem_complete <- readRDS("data-raw/V-Dem-CY-Full+Others-v11.rds")
+vdem_complete <- readRDS("data-raw/V-Dem-CY-Full+Others-v12.rds")
 
 MAX_DATA <- max(vdem_complete$year)
 MIN_DATA <- MAX_DATA - 9  # go back 9 years, for 10 years total, for time series plot
 
 # PART data
-dat_complete <- read.csv("data-raw/part-v11.csv")%>%
+# UPDATE: version
+dat_complete <- read.csv("data-raw/part-v12.csv")%>%
   mutate(
     lagged_v2x_regime_amb_asCharacter = case_when(
       lagged_v2x_regime_amb.0 == 1 ~ "Closed Autocracy",
@@ -101,20 +102,20 @@ map_data <- st_as_sf(raw_map_data)
 map_data <- map_data %>%
   st_transform("+proj=longlat +datum=WGS84")
 map_data <- map_data %>%
-  select(GWCODE, CNTRY_NAME) %>%
-  rename(gwcode = GWCODE)
+  select(gwcode, country_name)
 
 # Add centroid lat/long
+# TEMP fix for cshapes issue with s2 (see demspaces #10)
+sf::sf_use_s2(FALSE)
 centroids <- map_data %>% st_centroid() %>% st_coordinates()
 map_data$center_lon <- centroids[, 1]
 map_data$center_lat <- centroids[, 2]
 
 # Add regime and risk data
 map_data <- map_data %>%
-  left_join(country_list, by = "gwcode")
+  left_join(country_list[, setdiff(colnames(country_list), "country_name")], by = "gwcode")
 
 # Construct popup text
-# UPDATE: the years here as needed
 popup_text <- function(country, prob, rank, regime) {
   prob <- as.character(round(prob*100, digits = 0))
   # "0" -> "<0"
@@ -135,7 +136,7 @@ popup_text <- function(country, prob, rank, regime) {
 }
 
 map_data <- map_data %>%
-  mutate(popUp_text = popup_text(CNTRY_NAME, prob_onset, rank, regime_asCharacter))
+  mutate(popUp_text = popup_text(country_name, prob_onset, rank, regime_asCharacter))
 
 saveRDS(map_data, file = "data/new_map_data.rds", compress = FALSE)
 

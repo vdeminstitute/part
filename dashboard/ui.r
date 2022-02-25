@@ -17,7 +17,7 @@ bootstrapPage(
             h3(
               tags$span(
                 # UPDATE: year range at the end of this line on the right
-                style = "font-size: 80%; color: black;", "The PART project uses data from the", a(href= "https://www.v-dem.net", "Varieties of Democracy (V-Dem)", target="_blank"), "Institute and other sources to estimate the risk of adverse regime transitions during the next", tags$b("two years (2021-2022)."),
+                style = "font-size: 80%; color: black;", "The PART project uses data from the", a(href= "https://www.v-dem.net", "Varieties of Democracy (V-Dem)", target="_blank"), "Institute and other sources to estimate the risk of adverse regime transitions during the next", tags$b("two years (2022-2023)."),
                 br(),
                 br(),
                 "We define an adverse regime transition as a year-to-year decrease in the",
@@ -125,14 +125,14 @@ bootstrapPage(
             h4(
               tags$span(
                 style = "font-size: 90%; color: black;",
-                tags$b("Yearly Risk Estimates"), " - We derive risk estimates starting from 2011 using a simulation framework that mimics the process we use to produce the current forecasts. In short, we first train our models using all data from 1970 to 2009. We then use data from 2010 to produce estimated risk forecasts for 2011-12. We then retrain our models using all data from 1970 to 2010, use data from 2011 to produce estimates for 2012-12. We conduct this iterative model check procedure for all years from 2011 onwards for which we have already observed the 2-year outcome.")
+                tags$b("Yearly Risk Estimates"), " - We derive risk estimates starting from 2011 using a simulation framework that mimics the process we use to produce the current forecasts. In short, we first train our models using all data from 1970 to 2009. We then use data from 2010 to produce estimated risk forecasts for 2011-12. We then retrain our models using all data from 1970 to 2010, use data from 2011 to produce estimates for 2012-22. We conduct this iterative model check procedure for all years from 2011 onwards for which we have already observed the 2-year outcome.")
             ),
             h4(
               tags$span(
                 style = "font-size: 90%; color: black;",
                 # UDATE: V-Dem data version and URL
                 tags$b("Data"), "- To produce our estimated risk forecasts, we use",
-                a(href= "https://www.v-dem.net/en/data/data/v-dem-dataset-v11/", "V-Dem data version 11", target="_blank"),
+                a(href= "https://www.v-dem.net/en/data/data/v-dem-dataset-v12/", "V-Dem data version 12", target="_blank"),
                 "along with" ,
                 a(href= "https://unstats.un.org/unsd/snaama/Index", "UN GDP and population data,", target="_blank"),
                 a(href= "https://icr.ethz.ch/publications/integrating-data-on-ethnicity-geography-and-conflict/", "ethnic power relations data (Vogt et al. 2015),", target="_blank"),
