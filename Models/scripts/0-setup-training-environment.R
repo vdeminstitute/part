@@ -23,9 +23,11 @@ library(states)
 setwd(here::here("Models"))
 
 # which year to forecast for?
-TARGET_YEAR <- 2021
+TARGET_YEAR <- 2022
+# version
+VERSION <- "v12"
 # test forecast years
-TEST_FORECAST_YEARS <- 2011:2019  # this should be one less than TARGET_YEAR
+TEST_FORECAST_YEARS <- 2011:2020  # this should be one less than TARGET_YEAR
                                   # because any_neg_change_2yr looks ahead at
                                   # next year, but we don't know what
                                   # any_neg_change in
@@ -59,7 +61,8 @@ cnames <- gwstates %>%
 # Complete, non-missing data, except for the TARGET, which will be missing for the
 # last year.
 
-complete_data <- read_csv("input/part-v11.csv")
+fn <- sprintf("input/part-%s.csv", VERSION)
+complete_data <- read_csv(fn)
 # # take these out from training data
 id_cols <- c("gwcode", "year", "country_name", "country_text_id", "country_id",
              "v2x_regime", "v2x_regime_amb", "any_neg_change")

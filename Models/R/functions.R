@@ -98,7 +98,7 @@ ggsepplot <- function(y, phat, outcome = "Y") {
   p <- ggplot(df, aes(x = index, y = 1)) +
     geom_bar(aes(fill = y), stat = "identity", position = "identity", width = 2) +
     geom_step(aes(y = phat), colour = "#00C218") +
-    scale_fill_manual(guide = FALSE, values = cols) +
+    scale_fill_manual(guide = "none", values = cols) +
     scale_x_continuous(expand = c(0, 0)) +
     scale_y_continuous(expand = c(0, 0)) +
     labs(x = "", y = sprintf("Pr(%s)", outcome)) +
