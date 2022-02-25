@@ -12,8 +12,8 @@
 #
 
 # Which year should the data reach to?
-TARGET_YEAR <- 2021
-VERSION <- "v11"
+TARGET_YEAR <- 2022
+VERSION <- "v12"
 
 library(dplyr)
 library(tidyr)
@@ -38,8 +38,7 @@ plotmiss <- function(x) {
 #   EPR ----
 #   ______________
 
-epr_dat <- read_csv("input/epr-yearly.csv", col_types = cols()) %>%
-  select(-date) %>%
+epr_dat <- read_csv("input/epr.csv", col_types = cols()) %>%
   filter(year < TARGET_YEAR) %>%
   mutate(year = year + TARGET_YEAR - max(year))
 names(epr_dat)[-c(1:2)] <- paste("lagged_", names(epr_dat)[-c(1:2)], sep = "")
@@ -135,8 +134,9 @@ names(ict)[-c(1:2)] <- paste("lagged_", names(ict)[-c(1:2)], sep = "")
 ## All observations we have a DV for...
 VDem_GW_regime_shift_data <- read_rds("output/vdem-augmented.rds")
 dim(VDem_GW_regime_shift_data)
-# v9:  7923 x 408
-# v11: 8190 x 410
+# v9:  7923, 408
+# v11: 8190, 410
+# v12: 8359, 410
 naCountFun(VDem_GW_regime_shift_data, TARGET_YEAR + 1)
 
 VDem_GW_regime_shift_data <- VDem_GW_regime_shift_data %>%
@@ -160,6 +160,7 @@ VDem_GW_regime_shift_data %>%
   filter(n_miss_y > 0)
 
 # v11: missing 2020 and 2021
+# v12: missing 2021 and 2022
 
 
 # Merge all datasets ------------------------------------------------------
@@ -258,7 +259,9 @@ if (any(colmiss > 0)) stop("Something is wrong, some columns have missing values
 colmiss_tgt <- naCountFun(part, TARGET_YEAR + 1)
 colmiss_tgt
 
-dim(part) ## 7683  217
+dim(part)
+# 7683, 217
+# 8359, 465
 
 part$date <- NULL
 

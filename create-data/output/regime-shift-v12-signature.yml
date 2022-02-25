@@ -1,0 +1,36 @@
+Class: data.frame
+Size_in_mem: 1.5 Mb
+N_countries: 174
+Years: 1970 - 2022
+N_columns: 25
+N_rows: 8359
+N_complete_rows: 8033
+Countries: 174
+Sum_any_neg_change: 174
+Sum_any_neg_change_2yr: 335
+Columns:
+- gwcode
+- year
+- country_name
+- country_id
+- any_neg_change
+- any_neg_change_2yr
+- v2x_regime
+- v2x_regime_amb
+- lagged_v2x_regime
+- lagged_v2x_regime_amb
+- lagged_v2x_regime_asCharacter
+- lagged_v2x_regime_asFactor
+- lagged_is_closed_autocracy
+- lagged_currentRegimeDuration
+- lagged_low_border_case
+- lagged_high_border_case
+- lagged_yrs_since_any_neg_change
+- lagged_num_of_neg_changes
+- lagged_any_neg_change
+- lagged_num_of_neg_changes_3yrs
+- lagged_num_of_neg_changes_5yrs
+- lagged_num_of_neg_changes_10yrs
+- lagged_was_neg_change_last_3yrs
+- lagged_was_neg_change_last_5yrs
+- lagged_was_neg_change_last_10yrs

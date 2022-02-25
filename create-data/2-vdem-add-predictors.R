@@ -14,8 +14,9 @@
 
 # UPDATE: the first year of the 2-year period we want to forecast for
 # Note that this is different from demspaces.
-TARGET_YEAR <- 2021
-VERSION <- "v11"
+TARGET_YEAR <- 2022
+# UPDATE: version number
+VERSION <- "v12"
 # keep this the same
 START_YEAR  <- 1968
 # The V-Dem data we use as input; should be correct automatically with VERSION
@@ -46,6 +47,7 @@ VDem_GW_regime_shift_data <- read_csv("output/regime-shift-data-1970on.csv",
 dim(VDem_GW_regime_shift_data)
 # v9:  7923 obs. of 26 variables
 # v11: 8190 obs. of 26 variables
+# v12: 8359, 25
 
 vdem_raw <- readRDS(VDEM_DATA)
 vdem_complete <- vdem_raw %>%
@@ -89,7 +91,8 @@ vdem_complete <- vdem_raw %>%
     v2mecorrpt, v2pepwrses, v2pepwrsoc, v2pepwrgen, v2pepwrort, v2peedueq, v2pehealth)
 # v11: 'v2lgamend' doesn't seem to exist anymore
 dim(vdem_complete)
-# 8602 x 186
+# 8602, 186
+# 8774, 193
 
 # Rule-based imputations
 # Some variables are missing because for conceptual reasons; set these to 0
@@ -188,8 +191,9 @@ vdem_clean_data <- vdem_clean_data %>%
   )
 
 dim(vdem_clean_data)
-# v9:  8258 x 191
-# v11: 8602 x 197
+# v9:  8258, 191
+# v11: 8602, 197
+# v12: 8774, 197
 
 # There are still some missing values. Try two approaches:
 # (1) For any missing values preceded by 3 identical non-NA values, use that
@@ -245,8 +249,9 @@ vdem_clean_data_lagged <- vdem_clean_data %>%
   mutate(year = year + 1)
 names(vdem_clean_data_lagged)[-c(1:5)] <- paste("lagged_", names(vdem_clean_data_lagged)[-c(1:5)], sep = "")
 dim(vdem_clean_data_lagged)
-# v9:  8258 x 191
-# v11: 8602 x 197
+# v9:  8258, 191
+# v11: 8602, 197
+# v12: 8774, 197
 
 
 vdem_clean_data_lagged_diff <- vdem_clean_data_lagged %>%
@@ -261,7 +266,8 @@ colnames(vdem_clean_data_lagged_diff) <- str_replace(
 vdem_data <- vdem_clean_data_lagged %>%
   left_join(vdem_clean_data_lagged_diff)
 dim(vdem_data)
-# v11: 8602 x 389
+# v11: 8602, 389
+# v12: 8774, 389
 # naCountFun(vdem_data, TARGET_YEAR)
 
 vDem_GW_data <- VDem_GW_regime_shift_data %>%
@@ -272,7 +278,8 @@ vDem_GW_data <- VDem_GW_regime_shift_data %>%
   ungroup() %>%
   arrange(country_id, year)
 dim(vDem_GW_data)
-# v11: 8190 x 392
+# v11: 8190, 392
+# v12: 8359, 410
 
 x <- naCountFun(vDem_GW_data, TARGET_YEAR + 1)
 x[x>0]

@@ -20,8 +20,8 @@
 
 # UPDATE: the first year of the 2-year period we want to forecast for
 # Note that this is different from demspaces.
-TARGET_YEAR <- 2021
-VERSION     <- "v11"
+TARGET_YEAR <- 2022
+VERSION     <- "v12"
 # The V-Dem data we use as input; should be correct automatically with VERSION
 VDEM_DATA <- sprintf("create-data/input/V-Dem-CY-Full+Others-%s.rds", VERSION)
 
@@ -59,13 +59,17 @@ Vdem_complete <- Vdem_raw %>%
 dim(Vdem_complete)
 ## v9: 19513 obs. of 3888 variables
 # v11: 19439 obs. of 4176 variables
+# v12: 19618, 4170
 
 ## Create DV and related variables
 
 # Is v2x_regime missing anywhere relevant?
 Vdem_complete %>%
   filter(is.na(v2x_regime), year > 1968, year!=TARGET_YEAR) %>%
-  select(country_id, year, country_name, v2x_regime)
+  select(country_id, year, country_name, v2x_regime) |>
+  group_by(country_id, country_name) %>%
+  summarize(years = paste0(range(year), collapse = " - ")) %>%
+  as_tibble()
 # v11: only South Yemen, id 23
 
 VDem_regime_shift_data <- Vdem_complete %>%
@@ -241,6 +245,8 @@ VDem_regime_shift_data <- VDem_regime_shift_data %>%
 dim(VDem_regime_shift_data)
 # v9:  8205 obs. of 26 variables
 # v11: 8555 obs. of 26 variables
+# v12: 8751, 25
+#
 # naCountFun(VDem_regime_shift_data, TARGET_YEAR + 1)
 # naCountFun(VDem_regime_shift_data, TARGET_YEAR)
 ## The NAs that remain in the "last_Xyrs" variables are all due to the start of new series after 1970... We fix these after we merge v-dem with gw
@@ -254,9 +260,10 @@ dim(VDem_regime_shift_data)
 keep <- gwstates$gwcode[gwstates$microstate == FALSE]
 GW_template <- state_panel(1970, TARGET_YEAR, partial = "any", useGW = TRUE) %>%
   filter(gwcode %in% keep)
-str(GW_template)
+dim(GW_template)
 # v9:  8074 obs. of  2 variables
 # v11: 8422 obs. of 2 variables
+# v12: 8596, 2
 
 VDem_GW_regime_shift_data <- GW_template%>%
   left_join(VDem_regime_shift_data)%>%
@@ -325,9 +332,10 @@ VDem_GW_regime_shift_data <- VDem_GW_regime_shift_data%>%
   filter(!(gwcode %in% non_in_vdem))%>%
   filter(!is.na(lagged_v2x_regime))
 
-str(VDem_GW_regime_shift_data)
+dim(VDem_GW_regime_shift_data)
 # v9:  7923 obs. of 26 variables:
 # v11: 8190 obs. of 26 variables:
+# v12: 8359, 25
 naCountFun(VDem_GW_regime_shift_data, TARGET_YEAR + 1)
 naCountFun(VDem_GW_regime_shift_data, TARGET_YEAR)
 

@@ -7,7 +7,7 @@ year,country_name
 1972,Ecuador
 1972,Madagascar
 1972,Philippines
-1972,The Gambia
+1972,Uruguay
 1973,Cambodia
 1973,Chile
 1973,Ghana
@@ -27,7 +27,6 @@ year,country_name
 1977,Thailand
 1977,Vietnam
 1978,Comoros
-1978,Malawi
 1978,Pakistan
 1978,Zimbabwe
 1979,Equatorial Guinea
@@ -49,11 +48,12 @@ year,country_name
 1985,South Africa
 1985,Sudan
 1985,Uganda
+1987,Dominican Republic
 1987,Fiji
+1987,Malawi
 1987,Tunisia
 1988,Burundi
 1989,Haiti
-1990,Dominican Republic
 1990,Sudan
 1991,Laos
 1991,Liberia
@@ -63,6 +63,7 @@ year,country_name
 1992,Haiti
 1992,Peru
 1993,Angola
+1993,Egypt
 1993,Russia
 1993,Sierra Leone
 1994,Namibia
@@ -74,7 +75,7 @@ year,country_name
 1996,Belarus
 1996,Burundi
 1996,Niger
-1997,Papua New Guinea
+1996,Zambia
 1997,Republic of the Congo
 1998,Sierra Leone
 1998,Ukraine
@@ -86,14 +87,13 @@ year,country_name
 2000,Malawi
 2000,North Macedonia
 2000,Solomon Islands
+2000,Tanzania
 2001,Madagascar
-2001,Tanzania
 2002,Bangladesh
 2002,Nepal
-2003,Venezuela
+2002,Venezuela
 2004,Central African Republic
 2004,Liberia
-2004,Papua New Guinea
 2004,Philippines
 2005,Haiti
 2005,Moldova
@@ -106,48 +106,44 @@ year,country_name
 2007,Bangladesh
 2007,Fiji
 2007,Nicaragua
+2007,Papua New Guinea
 2007,Thailand
 2008,Mauritania
 2009,Guinea
 2009,Honduras
 2009,Madagascar
 2009,Niger
-2009,Tanzania
 2010,Hungary
 2010,Madagascar
 2010,Niger
-2011,Kosovo
-2011,Ukraine
+2010,Ukraine
+2011,North Macedonia
 2012,Mali
 2012,Nepal
-2012,North Macedonia
 2013,Egypt
 2013,Guinea-Bissau
 2013,Latvia
 2013,Maldives
 2013,Montenegro
-2013,Serbia
 2013,Slovakia
 2013,South Africa
 2013,Syria
 2013,Thailand
 2013,Turkey
+2013,Zambia
 2014,Libya
+2014,Serbia
 2014,Thailand
 2014,Uzbekistan
-2014,Zambia
 2015,Benin
 2015,Burkina Faso
-2015,Comoros
 2015,Ghana
-2015,Tanzania
-2016,Kenya
 2016,Latvia
 2016,Lithuania
 2016,Poland
 2016,Vietnam
 2016,Yemen
-2017,Botswana
+2017,Kenya
 2017,Mauritius
 2018,Greece
 2018,Hungary
@@ -163,5 +159,17 @@ year,country_name
 2019,Sudan
 2020,Czech Republic
 2020,Ivory Coast
-2020,Portugal
 2020,Slovenia
+2020,The Gambia
+2021,Afghanistan
+2021,Austria
+2021,Burma/Myanmar
+2021,Chad
+2021,El Salvador
+2021,Ghana
+2021,Guinea
+2021,Mali
+2021,Nigeria
+2021,Portugal
+2021,Trinidad and Tobago
+2021,Tunisia
