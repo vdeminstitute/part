@@ -21,11 +21,11 @@ bootstrapPage(
                 br(),
                 br(),
                 "We define an adverse regime transition as a year-to-year decrease in the",
-                a(href = "https://www.v-dem.net/files/5/Regimes%20of%20the%20World%20-%20Final.pdf", "Regimes of the World (RoW) index,", target="_blank"),
+                a(href = "https://www.cogitatiopress.com/politicsandgovernance/article/view/1214", "Regimes of the World (RoW) index,", target="_blank"),
                 "which classifies political regimes as either a ", tags$b("closed autocracy, electoral autocracy, electoral democracy, or liberal democracy. "), "The PART project estimates the risk of moving down this scale within a two-year window.",
                 br(),
                 br(),
-                "For more details, please see our", a(href= "https://www.v-dem.net/media/filer_public/b9/b2/b9b2c233-ec45-425d-a397-1cd80dadb63a/v-dem_working_paper_2019_89.pdf", " working paper.", target="_blank"), "We welcome feedback."
+                "For more details, please see our", a(href= "https://www.v-dem.net/media/publications/v-dem_working_paper_2019_89.pdf", " working paper.", target="_blank"), "We welcome feedback."
               )
             )
           )
@@ -117,7 +117,7 @@ bootstrapPage(
             h4(
               tags$span(
                 style = "font-size: 90%; color: black;",
-                "(See", a(href= "https://www.v-dem.net/media/filer_public/b9/b2/b9b2c233-ec45-425d-a397-1cd80dadb63a/v-dem_working_paper_2019_89.pdf", " working paper", target="_blank"), " for more details)",
+                "(See", a(href= "https://www.v-dem.net/media/publications/v-dem_working_paper_2019_89.pdf", " working paper", target="_blank"), " for more details)",
                 br(),
                 br(),
                 "It is important to note that these forecasts are probabilistic: a high estimated risk does not mean that an ART will occur with certainty; similarly, a low estimated risk does not mean that there is zero change an ART will not occur.",
@@ -132,7 +132,7 @@ bootstrapPage(
                 style = "font-size: 90%; color: black;",
                 # UDATE: V-Dem data version and URL
                 tags$b("Data"), "- To produce our estimated risk forecasts, we use",
-                a(href= "https://www.v-dem.net/en/data/data/v-dem-dataset-v12/", "V-Dem data version 12", target="_blank"),
+                a(href= "https://www.v-dem.net/vdemds.html", "V-Dem data version 12", target="_blank"),
                 "along with" ,
                 a(href= "https://unstats.un.org/unsd/snaama/Index", "UN GDP and population data,", target="_blank"),
                 a(href= "https://icr.ethz.ch/publications/integrating-data-on-ethnicity-geography-and-conflict/", "ethnic power relations data (Vogt et al. 2015),", target="_blank"),
