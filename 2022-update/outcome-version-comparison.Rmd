@@ -1,0 +1,111 @@
+---
+title: "Changes in RoW transitions between V-Dem data versions"
+output: github_document
+---
+
+Andreas Beger  
+`r format(Sys.Date(), "%d %B %Y")`
+
+The indicators on which the regimes of the world (RoW) classification is based can change for the same case between V-Dem dataset versions. As a result the set of outcomes--decreases in RoW--changes between V-Dem versions. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+suppressPackageStartupMessages({
+  library(states)
+  library(dplyr)
+  library(readr)
+  library(here)
+})
+
+keep <- c("gwcode", "country_id", "year", "country_name", "any_neg_change",
+          "any_neg_change_2yr", "v2x_regime", "lagged_v2x_regime")
+
+v9 <- read_csv(here("archive/part-v9.csv"), col_types = cols())[, keep]
+v11 <- read_csv(here("archive/part-v11.csv"), col_types = cols())[, keep]
+v12 <- read_csv(here("archive/part-v12.csv"), col_types = cols())[, keep]
+
+# v9 doesn't have the right name for North Macedonia. That will cause merge
+# problems.
+v9$country_name[v9$country_name=="Macedonia"] <- "North Macedonia"
+
+vdem11 <- readRDS(here("create-data/input/V-Dem-CY-Full+Others-v11.rds"))[, c("country_id", "year", "v2x_regime")]
+vdem11 <- vdem11[vdem11$year >= min(v9$year), ]
+
+vdem12 <- readRDS(here("create-data/input/V-Dem-CY-Full+Others-v12.rds"))[, c("country_id", "year", "v2x_regime")]
+vdem12 <- vdem11[vdem12$year >= min(v9$year), ]
+
+# I want a dataset that has all cases which are positive in either version
+# Start by adding an indicator for RoW changes
+v9pos <- v9 %>%
+  filter(year < 2019) %>%
+  mutate(v9pos = any_neg_change,
+         v9change = paste0(lagged_v2x_regime, "->", v2x_regime)) %>%
+  select(gwcode, country_id, year, country_name, v9pos, v9change)
+v11pos <- v11 %>%
+  filter(
+         # drop years that are not in v9
+         year %in% unique(v9pos$year)) %>%
+  mutate(v11pos = any_neg_change,
+         v11change = paste0(lagged_v2x_regime, "->", v2x_regime)) %>%
+  select(gwcode, country_id, year, country_name, v11pos, v11change)
+v12pos <- v12 %>%
+  filter(
+    # drop years that are not in v9
+    year %in% unique(v9pos$year)) %>%
+  mutate(v12pos = any_neg_change,
+         v12change = paste0(lagged_v2x_regime, "->", v2x_regime)) %>%
+  select(gwcode, country_id, year, country_name, v12pos, v12change)
+
+all <- full_join(v9pos, v11pos) %>%
+  full_join(v12pos) %>%
+  filter(v9pos==1 | v11pos==1 | v12pos==1)
+```
+
+There was no V-Dem version 10 update for PART, so I will just compare v9, v11, and v12 here.
+
+Here is the first version change, from v9 to v11:
+
+```{r}
+table(v9 = all$v9pos, v11 = all$v11pos)
+```
+
+The joint 0 values here are because the v12 transitions are also in this data frame, and must be transitions in v12 but not v9 or v11. 
+
+In any case, there are 222 RoW decreases between the v9 and v11 data, but agreement in only 121 of those cases (55%). 
+
+That's a challenge for assessing the accuracy of forecasts. In essence, if we develop forecasts using the v9 V-Dem data, and then score it with the v10 or v11 V-Dem data, the ground will have shifted under us. I'm not sure that there is anything to do about this. We had the same problem with the democratic spaces project and discussed this issue in the spring of 2020 when we did the v10 update.
+
+The underlying problem is that the RoW indicator depends on thresholds in a variety of other indicators, and the values of those other indicators shift slightly when the measurement models are re-run with each data update. Even though such shifts might be miniscule, they can in some cases cross a relevant threshold, thus changing the RoW category.
+
+Here is the agreement for the v11 and v12 data:
+
+```{r}
+df <- all[all$v11pos==1 | all$v12pos==1, ]
+with(df, table(v11 = v11pos, v12 = v12pos))
+```
+
+There is more agreement. Of 168 joint transitions, 137 are in agreement (82%). The disagreements are also more balanced now, whereas between v9 and v11, it seems like v9 was a lot more aggressive in coding transitions than v11 is. We went from (33 + 67) / (33 + 67 + 121) = 45% disagreement to now (13 + 17) / (13 + 17 + 137) a bit under 18% disagreement.
+
+Case counts by which version they show up in:
+
+```{r}
+all %>%
+  count(v12pos, v11pos, v9pos) %>%
+  arrange(desc(v12pos), desc(v11pos), desc(v9pos)) %>%
+  knitr::kable()
+
+#' The case with missing values is Kosovo 2005, which was not an independent
+#' state at the time yet.
+
+
+#' Below is a table of positive cases in either dataset.
+
+all %>%
+  arrange(country_name, year) %>%
+  knitr::kable()
+
+```
+

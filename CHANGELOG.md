@@ -1,3 +1,13 @@
+2022 Update (v12)
+=================
+
+Spring 2022 work to update the forecasts for 2022-2023. 
+
+There was only one major change:
+
+- Moved the external data updates to a new repo, `ds-external-data`, that consolidates them with the external data needed by DemSpaces. 
+
+
 2021 Update (v11)
 =================
 
