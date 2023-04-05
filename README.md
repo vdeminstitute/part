@@ -1,7 +1,7 @@
 Predicting Adverse Regime Transitions (PART)
 ============================================
 
-Data and code for the V-Dem PART project to predict the risk of adverse regime transitions. The dashboard with forecasts can be seen at https://www.v-dem.net/en/analysis/Forecast. (To run a local version that is probably faster, see [dashboard/README.md](dashboard/README.md))
+Data and code for the V-Dem PART project to predict the risk of adverse regime transitions. The dashboard with forecasts can be seen at [https://www.v-dem.net/vforecast_dash](https://www.v-dem.net/vforecast_dash). (To run a local version that is probably faster, see [dashboard/README.md](dashboard/README.md))
 
 Reproduction
 ------------
